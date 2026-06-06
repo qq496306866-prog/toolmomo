@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
@@ -50,6 +51,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
+      <head>
+        <Script
+          async
+          crossOrigin="anonymous"
+          id="google-adsense"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1935746779426009"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>{children}</body>
       {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
     </html>

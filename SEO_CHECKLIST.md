@@ -8,6 +8,8 @@
 - `sitemap.xml`
 - 首页基础 `metadata`
 - 工具页路由
+- 分类聚合页已加入 Sitemap
+- 使用场景聚合页已加入 Sitemap
 - 关于我们、联系我们、隐私政策、免责声明
 - 网站图标 `icon.svg`
 - Web App manifest

@@ -10,6 +10,16 @@ function formatLocalDateInput(date: Date) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 }
 
+function formatDate(date: Date) {
+  return {
+    local: date.toLocaleString("zh-CN", { hour12: false }),
+    utc: date.toUTCString(),
+    iso: date.toISOString(),
+    seconds: Math.floor(date.getTime() / 1000),
+    milliseconds: date.getTime(),
+  };
+}
+
 function parseTimestamp(value: string) {
   const trimmed = value.trim();
 
@@ -23,7 +33,7 @@ function parseTimestamp(value: string) {
     throw new Error("时间戳数值无效。");
   }
 
-  const milliseconds = trimmed.length <= 10 ? numericValue * 1000 : numericValue;
+  const milliseconds = Math.abs(numericValue) < 100000000000 ? numericValue * 1000 : numericValue;
   const date = new Date(milliseconds);
 
   if (Number.isNaN(date.getTime())) {
@@ -34,31 +44,33 @@ function parseTimestamp(value: string) {
 }
 
 export function TimestampTool() {
-  const now = useMemo(() => new Date(), []);
-  const [timestampInput, setTimestampInput] = useState(String(Math.floor(now.getTime() / 1000)));
-  const [dateInput, setDateInput] = useState(formatLocalDateInput(now));
-  const [timestampResult, setTimestampResult] = useState({
-    local: now.toLocaleString(),
-    iso: now.toISOString(),
-    seconds: Math.floor(now.getTime() / 1000),
-    milliseconds: now.getTime(),
-  });
-  const [dateResult, setDateResult] = useState({
-    seconds: Math.floor(now.getTime() / 1000),
-    milliseconds: now.getTime(),
-  });
+  const initialDate = useMemo(() => new Date(), []);
+  const [timestampInput, setTimestampInput] = useState(String(Math.floor(initialDate.getTime() / 1000)));
+  const [dateInput, setDateInput] = useState(formatLocalDateInput(initialDate));
+  const [timestampResult, setTimestampResult] = useState(formatDate(initialDate));
+  const [dateResult, setDateResult] = useState(formatDate(initialDate));
   const [error, setError] = useState("");
+  const [copyText, setCopyText] = useState("复制结果");
+
+  const detectedType = useMemo(() => {
+    const trimmed = timestampInput.trim();
+
+    if (!/^-?\d+$/.test(trimmed)) {
+      return "待识别";
+    }
+
+    return Math.abs(Number(trimmed)) < 100000000000 ? "秒级时间戳" : "毫秒级时间戳";
+  }, [timestampInput]);
+
+  const resetCopyText = () => {
+    setCopyText("复制结果");
+  };
 
   const convertTimestamp = () => {
     try {
-      const date = parseTimestamp(timestampInput);
-      setTimestampResult({
-        local: date.toLocaleString(),
-        iso: date.toISOString(),
-        seconds: Math.floor(date.getTime() / 1000),
-        milliseconds: date.getTime(),
-      });
+      setTimestampResult(formatDate(parseTimestamp(timestampInput)));
       setError("");
+      resetCopyText();
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "时间戳转换失败。");
     }
@@ -72,35 +84,56 @@ export function TimestampTool() {
       return;
     }
 
-    setDateResult({
-      seconds: Math.floor(date.getTime() / 1000),
-      milliseconds: date.getTime(),
-    });
+    setDateResult(formatDate(date));
     setError("");
+    resetCopyText();
   };
 
   const useCurrentTime = () => {
     const current = new Date();
-    const seconds = Math.floor(current.getTime() / 1000);
+    const result = formatDate(current);
 
-    setTimestampInput(String(seconds));
+    setTimestampInput(String(result.seconds));
     setDateInput(formatLocalDateInput(current));
-    setTimestampResult({
-      local: current.toLocaleString(),
-      iso: current.toISOString(),
-      seconds,
-      milliseconds: current.getTime(),
-    });
-    setDateResult({
-      seconds,
-      milliseconds: current.getTime(),
-    });
+    setTimestampResult(result);
+    setDateResult(result);
     setError("");
+    resetCopyText();
+  };
+
+  const handleCopy = async (value: string | number, label = "已复制") => {
+    try {
+      await navigator.clipboard.writeText(String(value));
+      setCopyText(label);
+      window.setTimeout(resetCopyText, 1600);
+    } catch {
+      setCopyText("复制失败");
+      window.setTimeout(resetCopyText, 1600);
+    }
   };
 
   return (
     <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-md bg-slate-50 p-4">
+          <div className="text-xs font-semibold text-slate-500">输入识别</div>
+          <div className="mt-2 text-lg font-bold text-primary-700">{detectedType}</div>
+        </div>
+        <div className="rounded-md bg-slate-50 p-4">
+          <div className="text-xs font-semibold text-slate-500">当前秒级时间戳</div>
+          <div className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-primary-700">
+            {dateResult.seconds}
+          </div>
+        </div>
+        <div className="rounded-md bg-slate-50 p-4">
+          <div className="text-xs font-semibold text-slate-500">当前毫秒级时间戳</div>
+          <div className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-accent-600">
+            {dateResult.milliseconds}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-md border border-slate-200 bg-white p-4">
           <h2 className="text-base font-bold text-slate-950">时间戳转日期</h2>
           <label className="mt-4 block text-sm font-semibold text-slate-800" htmlFor="timestamp-input">
@@ -126,14 +159,12 @@ export function TimestampTool() {
               <div className="mt-1 break-all font-mono text-slate-950">{timestampResult.local}</div>
             </div>
             <div>
-              <div className="font-semibold text-slate-500">ISO 时间</div>
-              <div className="mt-1 break-all font-mono text-slate-950">{timestampResult.iso}</div>
+              <div className="font-semibold text-slate-500">UTC 时间</div>
+              <div className="mt-1 break-all font-mono text-slate-950">{timestampResult.utc}</div>
             </div>
             <div>
-              <div className="font-semibold text-slate-500">秒 / 毫秒</div>
-              <div className="mt-1 break-all font-mono text-slate-950">
-                {timestampResult.seconds} / {timestampResult.milliseconds}
-              </div>
+              <div className="font-semibold text-slate-500">ISO 时间</div>
+              <div className="mt-1 break-all font-mono text-slate-950">{timestampResult.iso}</div>
             </div>
           </div>
         </div>
@@ -147,6 +178,7 @@ export function TimestampTool() {
             className="mt-2 w-full rounded-md border border-slate-200 px-4 py-3 font-mono text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
             id="date-input"
             onChange={(event) => setDateInput(event.target.value)}
+            step="1"
             type="datetime-local"
             value={dateInput}
           />
@@ -160,15 +192,23 @@ export function TimestampTool() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="min-w-0 rounded-md bg-slate-50 p-4">
               <div className="text-xs font-semibold text-slate-500">秒级时间戳</div>
-              <div className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-primary-700">
+              <button
+                className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-primary-700"
+                onClick={() => handleCopy(dateResult.seconds, "秒级已复制")}
+                type="button"
+              >
                 {dateResult.seconds}
-              </div>
+              </button>
             </div>
             <div className="min-w-0 rounded-md bg-slate-50 p-4">
               <div className="text-xs font-semibold text-slate-500">毫秒级时间戳</div>
-              <div className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-primary-700">
+              <button
+                className="mt-2 overflow-x-auto whitespace-nowrap font-mono text-xl font-bold text-primary-700"
+                onClick={() => handleCopy(dateResult.milliseconds, "毫秒级已复制")}
+                type="button"
+              >
                 {dateResult.milliseconds}
-              </div>
+              </button>
             </div>
           </div>
         </div>
@@ -182,11 +222,18 @@ export function TimestampTool() {
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button
-          className="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+          className="rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-white hover:bg-accent-600"
           onClick={useCurrentTime}
           type="button"
         >
           使用当前时间
+        </button>
+        <button
+          className="rounded-md border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+          onClick={() => handleCopy(timestampResult.iso, "ISO已复制")}
+          type="button"
+        >
+          {copyText}
         </button>
       </div>
     </section>

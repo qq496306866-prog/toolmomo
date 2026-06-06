@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   description:
     "提供图片处理、文本整理、电商运营、短视频创作、开发者常用工具，打开即用，无需安装。",
   keywords: ["Toolmomo", "在线工具", "中文工具箱", "图片工具", "文本工具", "开发工具", "电商工具"],
+  verification: {
+    google: "p00mldr9Ddv6rm-jWcObCeKimRwjujIfKQuSD7FP5ZA",
+  },
   alternates: {
     canonical: "/",
   },

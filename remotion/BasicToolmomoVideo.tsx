@@ -88,13 +88,7 @@ export function BasicToolmomoVideo({
             transform: `scale(${0.92 + cardProgress * 0.08})`,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 22,
-            }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
             <div
               style={{
                 display: "grid",

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "remotion:studio": "remotion studio remotion/index.ts",
+    "remotion:render:short": "remotion render remotion/index.ts short-video-template out/short-video-template.mp4"
   },
   "dependencies": {
     "@next/third-parties": "^16.2.7",
@@ -20,6 +22,7 @@
     "remotion": "^4.0.473"
   },
   "devDependencies": {
+    "@remotion/cli": "^4.0.473",
     "@types/node": "^22.15.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

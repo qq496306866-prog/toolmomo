@@ -29,6 +29,7 @@ export function AiKeywordsTool() {
   const [scenario, setScenario] = useState("");
   const [features, setFeatures] = useState("");
   const [copyText, setCopyText] = useState("复制全部");
+  const [copyGroupedText, setCopyGroupedText] = useState("复制分组");
 
   const keywordGroups = useMemo(() => {
     const core = coreKeyword.trim() || "核心词";
@@ -74,6 +75,7 @@ export function AiKeywordsTool() {
     setScenario("");
     setFeatures("");
     setCopyText("复制全部");
+    setCopyGroupedText("复制分组");
   };
 
   const handleCopy = async () => {
@@ -97,6 +99,35 @@ export function AiKeywordsTool() {
     { title: "场景词", items: keywordGroups.scenario },
     { title: "卖点词", items: keywordGroups.feature },
   ];
+
+  const groupedText = groups
+    .map((group) => `【${group.title}】\n${group.items.join("\n") || "暂无"}`)
+    .join("\n\n");
+
+  const csvText = ["分组,关键词", ...groups.flatMap((group) => group.items.map((item) => `${group.title},${item}`))].join(
+    "\n",
+  );
+
+  const handleCopyGrouped = async () => {
+    try {
+      await navigator.clipboard.writeText(groupedText);
+      setCopyGroupedText("已复制分组");
+      window.setTimeout(() => setCopyGroupedText("复制分组"), 1600);
+    } catch {
+      setCopyGroupedText("复制失败");
+      window.setTimeout(() => setCopyGroupedText("复制分组"), 1600);
+    }
+  };
+
+  const handleDownloadCsv = () => {
+    const blob = new Blob([`\uFEFF${csvText}`], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${coreKeyword.trim() || "toolmomo-keywords"}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
@@ -184,6 +215,10 @@ export function AiKeywordsTool() {
           <p className="mt-2 text-sm leading-6 text-slate-500">
             当前为本地模板扩展，不调用后端 AI。适合先整理搜索词、标题词和选题词。
           </p>
+          <div className="mt-4 rounded-md bg-white p-3 text-xs leading-5 text-slate-500">
+            <div className="font-semibold text-slate-800">导出建议</div>
+            <div className="mt-1">复制全部适合粘贴到文本框，CSV 适合表格整理和批量筛选。</div>
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               className="rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-white hover:bg-accent-600"
@@ -192,6 +227,26 @@ export function AiKeywordsTool() {
             >
               {copyText}
             </button>
+            <button
+              className="rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              onClick={handleCopyGrouped}
+              type="button"
+            >
+              {copyGroupedText}
+            </button>
+            <button
+              className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+              onClick={handleDownloadCsv}
+              type="button"
+            >
+              下载 CSV
+            </button>
+            <a
+              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              href="/tools/ai-title"
+            >
+              生成标题
+            </a>
             <button
               className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
               onClick={handleSample}

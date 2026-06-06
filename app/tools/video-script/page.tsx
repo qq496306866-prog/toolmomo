@@ -11,6 +11,11 @@ export const metadata: Metadata = {
 
 const relatedTools = [
   {
+    name: "短视频模板生成",
+    href: "/tools/video-template",
+    description: "把脚本内容整理成可预览的 Remotion 视频模板。",
+  },
+  {
     name: "小红书标题生成",
     href: "/tools/xhs-title",
     description: "按场景生成更适合种草内容的标题。",

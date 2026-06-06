@@ -16,14 +16,14 @@ const relatedTools = [
     description: "快速生成营销文案、标题和短内容草稿。",
   },
   {
-    name: "小红书标题生成",
-    href: "/tools/xhs-title",
-    description: "按场景生成更适合种草内容的标题。",
+    name: "AI关键词扩展",
+    href: "/tools/ai-keywords",
+    description: "围绕主题扩展搜索词、卖点词和长尾词。",
   },
   {
-    name: "商品标题优化",
-    href: "/tools/product-title",
-    description: "整理商品卖点，生成更清晰的标题结构。",
+    name: "短视频脚本模板",
+    href: "/tools/video-script",
+    description: "把标题方向继续扩展成口播和分镜脚本。",
   },
 ];
 

@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 
 const relatedTools = [
   {
+    name: "AI文案生成",
+    href: "/tools/ai-copywriting",
+    description: "快速生成营销文案、标题和短内容草稿。",
+  },
+  {
     name: "AI标题助手",
     href: "/tools/ai-title",
     description: "生成小红书、短视频和电商标题灵感。",
-  },
-  {
-    name: "商品标题优化",
-    href: "/tools/product-title",
-    description: "整理商品卖点，生成更清晰的标题结构。",
   },
   {
     name: "文本去重",

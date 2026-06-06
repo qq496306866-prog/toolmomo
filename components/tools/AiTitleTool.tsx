@@ -21,6 +21,40 @@ const styles = {
 type PlatformKey = keyof typeof platforms;
 type StyleKey = keyof typeof styles;
 
+const titlePresets: Array<{
+  label: string;
+  platform: PlatformKey;
+  style: StyleKey;
+  topic: string;
+  audience: string;
+  keywords: string;
+}> = [
+  {
+    label: "小红书种草",
+    platform: "xhs",
+    style: "benefit",
+    topic: "通勤咖啡杯选购",
+    audience: "上班族",
+    keywords: "防漏, 保温, 高颜值",
+  },
+  {
+    label: "短视频封面",
+    platform: "video",
+    style: "curiosity",
+    topic: "新手做短视频",
+    audience: "自媒体新人",
+    keywords: "脚本, 镜头, 节奏",
+  },
+  {
+    label: "电商商品",
+    platform: "ecommerce",
+    style: "list",
+    topic: "夏季防晒衣",
+    audience: "户外通勤人群",
+    keywords: "轻薄, 防晒, 透气",
+  },
+];
+
 function splitKeywords(value: string) {
   return value
     .split(/[\n,，、;；]+/)
@@ -48,6 +82,7 @@ export function AiTitleTool() {
   const [audience, setAudience] = useState("");
   const [keywords, setKeywords] = useState("");
   const [copyText, setCopyText] = useState("复制第一条");
+  const [copyAllText, setCopyAllText] = useState("复制全部");
 
   const titles = useMemo(() => {
     const core = topic.trim() || "你的主题";
@@ -103,12 +138,7 @@ export function AiTitleTool() {
   }, [audience, keywords, platform, style, topic]);
 
   const handleSample = () => {
-    setPlatform("xhs");
-    setStyle("benefit");
-    setTopic("通勤咖啡杯选购");
-    setAudience("上班族");
-    setKeywords("防漏, 保温, 高颜值");
-    setCopyText("复制第一条");
+    applyPreset(titlePresets[0]);
   };
 
   const handleClear = () => {
@@ -116,6 +146,17 @@ export function AiTitleTool() {
     setAudience("");
     setKeywords("");
     setCopyText("复制第一条");
+    setCopyAllText("复制全部");
+  };
+
+  const applyPreset = (preset: (typeof titlePresets)[number]) => {
+    setPlatform(preset.platform);
+    setStyle(preset.style);
+    setTopic(preset.topic);
+    setAudience(preset.audience);
+    setKeywords(preset.keywords);
+    setCopyText("复制第一条");
+    setCopyAllText("复制全部");
   };
 
   const handleCopy = async (title: string, first = false) => {
@@ -130,6 +171,17 @@ export function AiTitleTool() {
         setCopyText("复制失败");
         window.setTimeout(() => setCopyText("复制第一条"), 1600);
       }
+    }
+  };
+
+  const handleCopyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(titles.join("\n"));
+      setCopyAllText("已复制全部");
+      window.setTimeout(() => setCopyAllText("复制全部"), 1600);
+    } catch {
+      setCopyAllText("复制失败");
+      window.setTimeout(() => setCopyAllText("复制全部"), 1600);
     }
   };
 
@@ -185,6 +237,22 @@ export function AiTitleTool() {
             </label>
           </div>
 
+          <div>
+            <div className="text-sm font-semibold text-slate-800">快捷场景</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {titlePresets.map((preset) => (
+                <button
+                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+                  key={preset.label}
+                  onClick={() => applyPreset(preset)}
+                  type="button"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="text-sm font-semibold text-slate-800" htmlFor="title-topic">
               主题/产品
@@ -225,6 +293,12 @@ export function AiTitleTool() {
           <p className="mt-2 text-sm leading-6 text-slate-500">
             当前为本地模板生成，不调用后端 AI。适合快速整理标题方向，后续可升级为真正 AI 生成。
           </p>
+          <div className="mt-4 rounded-md bg-white p-3 text-xs leading-5 text-slate-500">
+            <div className="font-semibold text-slate-800">标题检查</div>
+            <div className="mt-1">
+              当前平台建议 ≤ {maxLengthByPlatform[platform]} 字，候选标题会自动截断过长内容。
+            </div>
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               className="rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-white hover:bg-accent-600"
@@ -233,6 +307,19 @@ export function AiTitleTool() {
             >
               {copyText}
             </button>
+            <button
+              className="rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              onClick={handleCopyAll}
+              type="button"
+            >
+              {copyAllText}
+            </button>
+            <a
+              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              href="/tools/ai-keywords"
+            >
+              扩展关键词
+            </a>
             <button
               className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
               onClick={handleSample}

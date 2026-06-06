@@ -12,6 +12,44 @@ const copyTypes = {
 
 type CopyType = keyof typeof copyTypes;
 
+const presetCases: Array<{
+  label: string;
+  copyType: CopyType;
+  subject: string;
+  audience: string;
+  scenario: string;
+  points: string;
+  tone: string;
+}> = [
+  {
+    label: "电商种草",
+    copyType: "social",
+    subject: "保温咖啡杯",
+    audience: "上班族",
+    scenario: "通勤和办公室",
+    points: "长效保温, 防漏设计, 高颜值, 大容量",
+    tone: "真实、轻松",
+  },
+  {
+    label: "活动促销",
+    copyType: "activity",
+    subject: "夏季防晒衣",
+    audience: "户外通勤人群",
+    scenario: "日常出门和周末出游",
+    points: "轻薄透气, 防晒遮阳, 好搭配",
+    tone: "直接、有购买理由",
+  },
+  {
+    label: "产品介绍",
+    copyType: "intro",
+    subject: "在线图片压缩工具",
+    audience: "电商运营和自媒体作者",
+    scenario: "上传商品图和文章配图前",
+    points: "本地处理, 降低图片体积, 操作简单",
+    tone: "清晰、专业",
+  },
+];
+
 function splitPoints(value: string) {
   return value
     .split(/[\n,，、;；]+/)
@@ -31,6 +69,7 @@ export function AiCopywritingTool() {
   const [points, setPoints] = useState("");
   const [tone, setTone] = useState("自然、有说服力");
   const [copyText, setCopyText] = useState("复制第一条");
+  const [copyAllText, setCopyAllText] = useState("复制全部");
 
   const drafts = useMemo(() => {
     const topic = subject.trim() || "你的产品";
@@ -74,13 +113,7 @@ export function AiCopywritingTool() {
   }, [audience, copyType, points, scenario, subject, tone]);
 
   const handleSample = () => {
-    setCopyType("social");
-    setSubject("保温咖啡杯");
-    setAudience("上班族");
-    setScenario("通勤和办公室");
-    setPoints("长效保温, 防漏设计, 高颜值, 大容量");
-    setTone("真实、轻松");
-    setCopyText("复制第一条");
+    applyPreset(presetCases[0]);
   };
 
   const handleClear = () => {
@@ -90,6 +123,18 @@ export function AiCopywritingTool() {
     setPoints("");
     setTone("自然、有说服力");
     setCopyText("复制第一条");
+    setCopyAllText("复制全部");
+  };
+
+  const applyPreset = (preset: (typeof presetCases)[number]) => {
+    setCopyType(preset.copyType);
+    setSubject(preset.subject);
+    setAudience(preset.audience);
+    setScenario(preset.scenario);
+    setPoints(preset.points);
+    setTone(preset.tone);
+    setCopyText("复制第一条");
+    setCopyAllText("复制全部");
   };
 
   const handleCopy = async (draft: string, first = false) => {
@@ -104,6 +149,17 @@ export function AiCopywritingTool() {
         setCopyText("复制失败");
         window.setTimeout(() => setCopyText("复制第一条"), 1600);
       }
+    }
+  };
+
+  const handleCopyAll = async () => {
+    try {
+      await navigator.clipboard.writeText(drafts.map((draft, index) => `${index + 1}. ${draft}`).join("\n"));
+      setCopyAllText("已复制全部");
+      window.setTimeout(() => setCopyAllText("复制全部"), 1600);
+    } catch {
+      setCopyAllText("复制失败");
+      window.setTimeout(() => setCopyAllText("复制全部"), 1600);
     }
   };
 
@@ -141,6 +197,22 @@ export function AiCopywritingTool() {
               ))}
             </select>
           </label>
+
+          <div>
+            <div className="text-sm font-semibold text-slate-800">快捷场景</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {presetCases.map((preset) => (
+                <button
+                  className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+                  key={preset.label}
+                  onClick={() => applyPreset(preset)}
+                  type="button"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <label className="text-sm font-semibold text-slate-800" htmlFor="copy-subject">
@@ -204,6 +276,10 @@ export function AiCopywritingTool() {
           <p className="mt-2 text-sm leading-6 text-slate-500">
             当前为本地模板生成，不调用后端 AI。适合先整理文案结构和表达方向。
           </p>
+          <div className="mt-4 rounded-md bg-white p-3 text-xs leading-5 text-slate-500">
+            <div className="font-semibold text-slate-800">下一步建议</div>
+            <div className="mt-1">文案生成后，可以继续提炼标题、扩展关键词或统计字数。</div>
+          </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               className="rounded-md bg-accent-500 px-4 py-2 text-sm font-semibold text-white hover:bg-accent-600"
@@ -212,6 +288,25 @@ export function AiCopywritingTool() {
             >
               {copyText}
             </button>
+            <button
+              className="rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              onClick={handleCopyAll}
+              type="button"
+            >
+              {copyAllText}
+            </button>
+            <a
+              className="rounded-md bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-800"
+              href="/tools/ai-title"
+            >
+              生成标题
+            </a>
+            <a
+              className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+              href="/tools/ai-keywords"
+            >
+              扩展关键词
+            </a>
             <button
               className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
               onClick={handleSample}

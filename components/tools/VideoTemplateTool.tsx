@@ -32,6 +32,40 @@ const defaultSections = [
   },
 ];
 
+const presetTemplates: Record<
+  TemplateStyle,
+  {
+    title: string;
+    hook: string;
+    points: string;
+    cta: string;
+  }
+> = {
+  sales: {
+    title: "保温咖啡杯",
+    hook: "上班族通勤路上，最怕咖啡变凉和杯子漏水。",
+    points:
+      "长效保温，早上装好下午还能喝\n杯盖密封，放包里也不容易漏\n杯身轻便，适合办公室和通勤",
+    cta: "收藏 Toolmomo，继续生成更多短视频模板",
+  },
+  knowledge: {
+    title: "新手做短视频",
+    hook: "很多新手不是不会拍，而是没有先把脚本和镜头拆清楚。",
+    points:
+      "先确定一个明确主题，不要一条视频讲太多\n开头 3 秒先给结果或痛点\n每个镜头只表达一个信息点\n结尾给用户一个明确行动",
+    cta: "收藏 Toolmomo，下次直接套用脚本模板",
+  },
+  list: {
+    title: "通勤好物清单",
+    hook: "这 3 个小东西，能让每天通勤省心很多。",
+    points:
+      "防漏保温杯，减少路上洒漏\n轻便收纳包，钥匙耳机不乱放\n便携充电线，手机没电也不慌",
+    cta: "关注 Toolmomo，继续整理实用清单",
+  },
+};
+
+const renderCommand = "npm run remotion:render:short";
+
 function splitLines(value: string) {
   return value
     .split("\n")
@@ -79,6 +113,7 @@ export function VideoTemplateTool() {
   );
   const [cta, setCta] = useState("收藏 Toolmomo，继续生成更多短视频模板");
   const [copyText, setCopyText] = useState("复制模板 JSON");
+  const [copyCommandText, setCopyCommandText] = useState("复制渲染命令");
 
   const templateData = useMemo<ShortVideoTemplateProps>(
     () => ({
@@ -92,13 +127,19 @@ export function VideoTemplateTool() {
     [cta, hook, points, style, title],
   );
 
-  const handleSample = () => {
-    setStyle("sales");
-    setTitle("保温咖啡杯");
-    setHook("上班族通勤路上，最怕咖啡变凉和杯子漏水。");
-    setPoints("长效保温，早上装好下午还能喝\n杯盖密封，放包里也不容易漏\n杯身轻便，适合办公室和通勤");
-    setCta("收藏 Toolmomo，继续生成更多短视频模板");
+  const applyPreset = (nextStyle: TemplateStyle) => {
+    const preset = presetTemplates[nextStyle];
+    setStyle(nextStyle);
+    setTitle(preset.title);
+    setHook(preset.hook);
+    setPoints(preset.points);
+    setCta(preset.cta);
     setCopyText("复制模板 JSON");
+    setCopyCommandText("复制渲染命令");
+  };
+
+  const handleSample = () => {
+    applyPreset("sales");
   };
 
   const handleClear = () => {
@@ -107,6 +148,7 @@ export function VideoTemplateTool() {
     setPoints("");
     setCta("");
     setCopyText("复制模板 JSON");
+    setCopyCommandText("复制渲染命令");
   };
 
   const handleCopy = async () => {
@@ -117,6 +159,17 @@ export function VideoTemplateTool() {
     } catch {
       setCopyText("复制失败");
       window.setTimeout(() => setCopyText("复制模板 JSON"), 1600);
+    }
+  };
+
+  const handleCopyCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(renderCommand);
+      setCopyCommandText("已复制命令");
+      window.setTimeout(() => setCopyCommandText("复制渲染命令"), 1600);
+    } catch {
+      setCopyCommandText("复制失败");
+      window.setTimeout(() => setCopyCommandText("复制渲染命令"), 1600);
     }
   };
 
@@ -156,6 +209,26 @@ export function VideoTemplateTool() {
               ))}
             </select>
           </label>
+
+          <div>
+            <div className="text-sm font-semibold text-slate-800">快捷预设</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {Object.entries(templateStyles).map(([key, label]) => (
+                <button
+                  className={`rounded-md px-3 py-2 text-sm font-semibold ${
+                    style === key
+                      ? "bg-primary-700 text-white"
+                      : "border border-slate-200 bg-white text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+                  }`}
+                  key={key}
+                  onClick={() => applyPreset(key as TemplateStyle)}
+                  type="button"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <label className="block text-sm font-semibold text-slate-800" htmlFor="template-title">
             视频标题
@@ -253,8 +326,15 @@ export function VideoTemplateTool() {
               Renderer 生成 MP4。
             </p>
             <code className="mt-3 block rounded-md bg-white p-3 text-xs leading-5 text-slate-600">
-              npm run remotion:render:short
+              {renderCommand}
             </code>
+            <button
+              className="mt-3 rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+              onClick={handleCopyCommand}
+              type="button"
+            >
+              {copyCommandText}
+            </button>
           </div>
         </div>
       </div>

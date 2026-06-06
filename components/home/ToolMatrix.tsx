@@ -1,7 +1,7 @@
 import { categoryTabs, toolsByCategory } from "@/data/tools";
 import { SectionHeader } from "./SectionHeader";
 
-const matrixCategories = categoryTabs.filter((category) => category !== "PDF工具" && category !== "生活工具");
+const matrixCategories = categoryTabs;
 
 export function ToolMatrix() {
   return (

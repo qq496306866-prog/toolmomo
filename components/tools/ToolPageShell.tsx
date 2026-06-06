@@ -19,8 +19,33 @@ export function ToolPageShell({
   children,
   sidebar,
 }: ToolPageShellProps) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: `${title} - Toolmomo`,
+    description,
+    applicationCategory: category,
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "CNY",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Toolmomo",
+      url: "https://toolmomo.com",
+    },
+  };
+
   return (
     <main className="min-h-screen bg-slate-50">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
       <TopBar />
       <Header />
       <section className="border-b border-slate-200 bg-gradient-to-b from-white via-primary-50 to-slate-50">

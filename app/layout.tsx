@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   keywords: ["Toolmomo", "在线工具", "中文工具箱", "图片工具", "文本工具", "开发工具", "电商工具"],
   verification: {
     google: "p00mldr9Ddv6rm-jWcObCeKimRwjujIfKQuSD7FP5ZA",
+    other: {
+      "baidu-site-verification": "codeva-KZTqTbegMd",
+    },
   },
   alternates: {
     canonical: "/",

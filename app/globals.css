@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f8fafc;
+  color: #0f172a;
+  font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.markdown-preview h1 {
+  margin: 0 0 14px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #020617;
+}
+
+.markdown-preview h2 {
+  margin: 18px 0 10px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #020617;
+}
+
+.markdown-preview h3 {
+  margin: 16px 0 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #020617;
+}
+
+.markdown-preview p {
+  margin: 0 0 10px;
+}
+
+.markdown-preview ul {
+  margin: 0 0 12px 20px;
+  list-style: disc;
+}
+
+.markdown-preview blockquote {
+  margin: 12px 0;
+  border-left: 3px solid #ff6a00;
+  padding-left: 12px;
+  color: #475569;
+}
+
+.markdown-preview pre {
+  margin: 12px 0;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #061a35;
+  padding: 12px;
+  color: #f8fafc;
+}
+
+.markdown-preview code {
+  border-radius: 4px;
+  background: #e2e8f0;
+  padding: 2px 5px;
+  font-family: Consolas, Monaco, monospace;
+}
+
+.markdown-preview pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-preview a {
+  color: #c94700;
+  font-weight: 600;
+}

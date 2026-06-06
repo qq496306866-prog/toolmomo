@@ -4,6 +4,7 @@ import { Header } from "@/components/home/Header";
 import { ToolCard } from "@/components/home/ToolCard";
 import { TopBar } from "@/components/home/TopBar";
 import { scenarioPacks, tools } from "@/data/tools";
+import { notFound } from "next/navigation";
 
 type ScenarioPageProps = {
   params: Promise<{
@@ -23,10 +24,23 @@ function getScenario(name: string) {
   return scenarioPacks.find((pack) => pack.title === name);
 }
 
+export function generateStaticParams() {
+  return scenarioPacks.map((pack) => ({
+    name: encodeURIComponent(pack.title),
+  }));
+}
+
 export async function generateMetadata({ params }: ScenarioPageProps): Promise<Metadata> {
   const { name } = await params;
   const scenarioName = decodeParam(name);
   const scenario = getScenario(scenarioName);
+
+  if (!scenario) {
+    return {
+      title: "场景不存在 - Toolmomo",
+      description: "这个使用场景不存在，可以返回 Toolmomo 全部工具页继续浏览。",
+    };
+  }
 
   return {
     title: `${scenario?.title ?? scenarioName} - Toolmomo`,
@@ -38,6 +52,11 @@ export default async function ScenarioPage({ params }: ScenarioPageProps) {
   const { name } = await params;
   const scenarioName = decodeParam(name);
   const scenario = getScenario(scenarioName);
+
+  if (!scenario) {
+    notFound();
+  }
+
   const scenarioTools = scenario ? tools.filter((tool) => scenario.tools.includes(tool.name)) : [];
 
   return (

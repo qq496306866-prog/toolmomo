@@ -4,6 +4,7 @@ import { Header } from "@/components/home/Header";
 import { ToolCard } from "@/components/home/ToolCard";
 import { TopBar } from "@/components/home/TopBar";
 import { categoryTabs, tools } from "@/data/tools";
+import { notFound } from "next/navigation";
 
 type CategoryPageProps = {
   params: Promise<{
@@ -23,9 +24,22 @@ function getCategoryTools(category: string) {
   return tools.filter((tool) => tool.category === category);
 }
 
+export function generateStaticParams() {
+  return categoryTabs.map((category) => ({
+    name: encodeURIComponent(category),
+  }));
+}
+
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { name } = await params;
   const category = decodeParam(name);
+
+  if (!categoryTabs.includes(category as (typeof categoryTabs)[number])) {
+    return {
+      title: "分类不存在 - Toolmomo",
+      description: "这个工具分类不存在，可以返回 Toolmomo 全部工具页继续浏览。",
+    };
+  }
 
   return {
     title: `${category} - Toolmomo`,
@@ -36,6 +50,11 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { name } = await params;
   const category = decodeParam(name);
+
+  if (!categoryTabs.includes(category as (typeof categoryTabs)[number])) {
+    notFound();
+  }
+
   const categoryTools = getCategoryTools(category);
 
   return (

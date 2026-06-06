@@ -48,6 +48,20 @@ npx tsc --noEmit --pretty false
 UPLOAD_CHECKLIST.md
 ```
 
+## SEO 收录
+
+上线后建议提交 Sitemap 给搜索引擎：
+
+```text
+https://toolmomo.com/sitemap.xml
+```
+
+详细清单见：
+
+```text
+SEO_CHECKLIST.md
+```
+
 ## 服务器部署思路
 
 Hostinger VPS 推荐使用：

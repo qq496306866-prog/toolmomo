@@ -5,6 +5,7 @@
 ## 文件说明
 
 - `deploy-ubuntu.sh`：首次部署或更新项目时可参考执行的脚本
+- `update-from-github.sh`：服务器从 GitHub 拉取最新代码并重启网站
 - `nginx-toolmomo.conf`：Nginx 反向代理配置
 
 ## 推荐部署目录
@@ -121,6 +122,12 @@ git pull
 npm install
 npm run build
 pm2 restart toolmomo
+```
+
+也可以直接执行：
+
+```bash
+bash deploy/update-from-github.sh
 ```
 
 ## 常用排查命令

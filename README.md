@@ -62,6 +62,15 @@ https://toolmomo.com/sitemap.xml
 SEO_CHECKLIST.md
 ```
 
+## GitHub 更新部署
+
+本地推送到 GitHub 后，服务器执行：
+
+```bash
+cd /var/www/toolmomo
+bash deploy/update-from-github.sh
+```
+
 ## 服务器部署思路
 
 Hostinger VPS 推荐使用：

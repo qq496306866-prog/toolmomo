@@ -1,6 +1,7 @@
 .next
 .next-broken-*
 node_modules
+.npm-cache
 out
 dist
 coverage

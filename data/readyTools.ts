@@ -13,6 +13,8 @@ const readyToolHrefs = new Set([
   "/tools/image-resize",
   "/tools/image-webp",
   "/tools/id-photo-bg",
+  "/tools/pdf-merge",
+  "/tools/pdf-to-image",
   "/tools/taobao-main-image",
   "/tools/product-title",
   "/tools/sku-helper",

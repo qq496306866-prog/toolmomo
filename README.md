@@ -64,6 +64,12 @@ Hostinger VPS 推荐使用：
 deploy/README.md
 ```
 
+项目 GitHub 仓库：
+
+```text
+https://github.com/qq496306866-prog/toolmomo.git
+```
+
 ### 1. 安装基础环境
 
 ```bash

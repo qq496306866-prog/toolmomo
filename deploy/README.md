@@ -80,6 +80,49 @@ npm run build
 pm2 restart toolmomo
 ```
 
+## 改用 GitHub 更新
+
+项目已推送到 GitHub 后，推荐把服务器目录改成 Git 仓库，以后不再手动上传 zip。
+
+仓库地址：
+
+```text
+https://github.com/qq496306866-prog/toolmomo.git
+```
+
+### 首次切换
+
+先备份当前线上目录：
+
+```bash
+cd /var/www
+mv toolmomo toolmomo-backup-$(date +%Y%m%d%H%M%S)
+git clone https://github.com/qq496306866-prog/toolmomo.git toolmomo
+cd /var/www/toolmomo
+npm install
+npm run build
+pm2 restart toolmomo
+```
+
+如果 `pm2 restart toolmomo` 提示进程不存在，执行：
+
+```bash
+pm2 start ecosystem.config.cjs
+pm2 save
+```
+
+### 后续更新
+
+以后本地推送到 GitHub 后，服务器只需要执行：
+
+```bash
+cd /var/www/toolmomo
+git pull
+npm install
+npm run build
+pm2 restart toolmomo
+```
+
 ## 常用排查命令
 
 ```bash

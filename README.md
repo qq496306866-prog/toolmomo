@@ -62,6 +62,13 @@ https://toolmomo.com/sitemap.xml
 SEO_CHECKLIST.md
 ```
 
+百度普通收录 API 推送可以使用：
+
+```powershell
+$env:BAIDU_PUSH_TOKEN = "你的百度推送 token"
+.\scripts\baidu-push.ps1
+```
+
 ## GitHub 更新部署
 
 本地推送到 GitHub 后，服务器执行：

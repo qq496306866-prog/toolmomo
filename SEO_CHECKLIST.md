@@ -52,6 +52,21 @@ https://ziyuan.baidu.com/
 https://toolmomo.com/sitemap.xml
 ```
 
+如果百度 Sitemap 配额不足，可以使用普通收录 API 推送。不要把 token 提交到 GitHub，建议在本机临时设置环境变量：
+
+```powershell
+$env:BAIDU_PUSH_TOKEN = "你的百度推送 token"
+.\scripts\baidu-push.ps1
+```
+
+脚本会读取：
+
+```text
+https://www.toolmomo.com/sitemap.xml
+```
+
+并把其中的 URL 推送给百度。
+
 ### Bing Webmaster Tools
 
 入口：

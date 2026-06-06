@@ -24,6 +24,7 @@ const readyToolHrefs = new Set([
   "/tools/sku-helper",
   "/tools/xhs-title",
   "/tools/video-script",
+  "/tools/video-template",
   "/tools/video-cover-title",
   "/tools/icp-query",
   "/tools/http-status",

@@ -223,6 +223,14 @@ export const tools: ToolItem[] = [
     isLatest: true,
   },
   {
+    name: "短视频模板生成",
+    description: "输入标题、钩子和镜头内容，生成可预览的 Remotion 竖版视频模板。",
+    category: "短视频工具",
+    href: "/tools/video-template",
+    icon: "模",
+    isLatest: true,
+  },
+  {
     name: "视频封面标题",
     description: "提炼封面短句，提升内容识别度。",
     category: "短视频工具",

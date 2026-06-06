@@ -7,6 +7,17 @@ type RenderedPage = {
   url: string;
 };
 
+type PdfDocument = {
+  numPages: number;
+  getPage: (pageNumber: number) => Promise<{
+    getViewport: (options: { scale: number }) => { width: number; height: number };
+    render: (options: {
+      canvasContext: CanvasRenderingContext2D;
+      viewport: { width: number; height: number };
+    }) => { promise: Promise<void> };
+  }>;
+};
+
 function formatSize(size: number) {
   if (size < 1024 * 1024) {
     return `${(size / 1024).toFixed(1)} KB`;
@@ -19,6 +30,7 @@ export function PdfToImageTool() {
   const [file, setFile] = useState<File | null>(null);
   const [scale, setScale] = useState(2);
   const [pages, setPages] = useState<RenderedPage[]>([]);
+  const [previewPage, setPreviewPage] = useState<RenderedPage | null>(null);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
@@ -33,6 +45,7 @@ export function PdfToImageTool() {
     pages.forEach((page) => URL.revokeObjectURL(page.url));
     setFile(selectedFile);
     setPages([]);
+    setPreviewPage(null);
     setStatus("");
     setError("");
   };
@@ -48,13 +61,21 @@ export function PdfToImageTool() {
       setError("");
       pages.forEach((page) => URL.revokeObjectURL(page.url));
       setPages([]);
+      setPreviewPage(null);
 
-      const pdfjsLib = await import("pdfjs-dist");
+      const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
       const pdfjs = pdfjsLib as typeof pdfjsLib & {
-        getDocument: (options: { data: ArrayBuffer; disableWorker: boolean }) => { promise: Promise<any> };
+        GlobalWorkerOptions: { workerSrc: string };
+        getDocument: (options: { data: Uint8Array }) => { promise: Promise<PdfDocument> };
       };
-      const data = await file.arrayBuffer();
-      const pdf = await pdfjs.getDocument({ data, disableWorker: true }).promise;
+
+      pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+        "pdfjs-dist/build/pdf.worker.min.mjs",
+        import.meta.url,
+      ).toString();
+
+      const data = new Uint8Array(await file.arrayBuffer());
+      const pdf = await pdfjs.getDocument({ data }).promise;
       const renderedPages: RenderedPage[] = [];
 
       for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
@@ -85,9 +106,10 @@ export function PdfToImageTool() {
 
       setPages(renderedPages);
       setStatus(`已生成 ${renderedPages.length} 张 PNG 图片。`);
-    } catch {
+    } catch (caughtError) {
       setStatus("");
-      setError("转换失败，请确认 PDF 没有加密或损坏。");
+      const message = caughtError instanceof Error ? caughtError.message : "";
+      setError(message ? `转换失败：${message}` : "转换失败，请确认 PDF 没有加密或损坏。");
     }
   };
 
@@ -95,6 +117,7 @@ export function PdfToImageTool() {
     pages.forEach((page) => URL.revokeObjectURL(page.url));
     setFile(null);
     setPages([]);
+    setPreviewPage(null);
     setStatus("");
     setError("");
   };
@@ -156,15 +179,75 @@ export function PdfToImageTool() {
         <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
           {pages.map((page) => (
             <div className="rounded-md border border-slate-200 bg-slate-50 p-3" key={page.pageNumber}>
-              <img alt={`PDF 第 ${page.pageNumber} 页`} className="max-h-[420px] w-full rounded border border-slate-200 bg-white object-contain" src={page.url} />
+              <button
+                className="block w-full"
+                onClick={() => setPreviewPage(page)}
+                type="button"
+              >
+                <img
+                  alt={`PDF 第 ${page.pageNumber} 页`}
+                  className="max-h-[420px] w-full rounded border border-slate-200 bg-white object-contain transition hover:border-accent-300"
+                  src={page.url}
+                />
+              </button>
               <div className="mt-3 flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-slate-700">第 {page.pageNumber} 页</div>
-                <a className="rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-900" download={`toolmomo-page-${page.pageNumber}.png`} href={page.url}>
-                  下载图片
-                </a>
+                <div className="flex gap-2">
+                  <button
+                    className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+                    onClick={() => setPreviewPage(page)}
+                    type="button"
+                  >
+                    预览
+                  </button>
+                  <a className="rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-900" download={`toolmomo-page-${page.pageNumber}.png`} href={page.url}>
+                    下载图片
+                  </a>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      ) : null}
+
+      {previewPage ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 p-4"
+          onClick={() => setPreviewPage(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="flex max-h-[92vh] w-full max-w-5xl flex-col rounded-md bg-white shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
+              <div className="font-semibold text-slate-950">图片预览 - 第 {previewPage.pageNumber} 页</div>
+              <div className="flex gap-2">
+                <a
+                  className="rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white hover:bg-primary-900"
+                  download={`toolmomo-page-${previewPage.pageNumber}.png`}
+                  href={previewPage.url}
+                >
+                  下载图片
+                </a>
+                <button
+                  className="rounded-md border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
+                  onClick={() => setPreviewPage(null)}
+                  type="button"
+                >
+                  关闭
+                </button>
+              </div>
+            </div>
+            <div className="min-h-0 overflow-auto bg-slate-100 p-4">
+              <img
+                alt={`PDF 第 ${previewPage.pageNumber} 页大图预览`}
+                className="mx-auto max-h-[78vh] rounded border border-slate-200 bg-white object-contain"
+                src={previewPage.url}
+              />
+            </div>
+          </div>
         </div>
       ) : null}
     </section>

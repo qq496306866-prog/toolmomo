@@ -20,15 +20,19 @@ function normalizeKeyword(value: string) {
   return value.trim().toLowerCase();
 }
 
+function getSearchText(tool: (typeof tools)[number]) {
+  return [tool.name, tool.description, tool.category, tool.icon, ...(tool.keywords ?? [])].join(" ").toLowerCase();
+}
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = "" } = await searchParams;
   const keyword = normalizeKeyword(q);
+  const keywordParts = keyword.split(/\s+/).filter(Boolean);
   const results = keyword
-    ? tools.filter((tool) =>
-        [tool.name, tool.description, tool.category, tool.icon].some((value) =>
-          value.toLowerCase().includes(keyword),
-        ),
-      )
+    ? tools.filter((tool) => {
+        const searchText = getSearchText(tool);
+        return keywordParts.every((part) => searchText.includes(part));
+      })
     : tools;
 
   return (

@@ -1,5 +1,8 @@
+"use client";
+
 import type { ToolItem } from "@/data/tools";
 import { isToolReady } from "@/data/readyTools";
+import { ToolFavoriteButton } from "@/components/tools/ToolFavoriteButton";
 
 type ToolCardProps = {
   tool: ToolItem;
@@ -18,7 +21,7 @@ export function ToolCard({ tool, compact = false }: ToolCardProps) {
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-primary-50 text-sm font-bold text-primary-700">
           {tool.icon}
         </span>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-bold text-slate-950 group-hover:text-accent-700">
             {tool.name}
           </h3>
@@ -26,6 +29,7 @@ export function ToolCard({ tool, compact = false }: ToolCardProps) {
             {tool.category}
           </span>
         </div>
+        <ToolFavoriteButton tool={tool} />
       </div>
       <span
         className={

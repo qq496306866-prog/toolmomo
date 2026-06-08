@@ -15,6 +15,7 @@ export type ToolItem = {
   category: ToolCategory;
   href: string;
   icon: string;
+  keywords?: string[];
   isPopular?: boolean;
   isLatest?: boolean;
 };
@@ -52,6 +53,10 @@ export const categoryTabs: ToolCategory[] = [
 
 export const hotSearches = [
   "图片压缩",
+  "颜色转换",
+  "随机密码",
+  "UUID",
+  "正则测试",
   "字数统计",
   "小红书标题",
   "淘宝主图",
@@ -66,6 +71,7 @@ export const tools: ToolItem[] = [
     category: "AI工具",
     href: "/tools/ai-copywriting",
     icon: "AI",
+    keywords: ["营销文案", "种草文案", "广告语", "朋友圈文案"],
     isPopular: true,
   },
   {
@@ -74,6 +80,7 @@ export const tools: ToolItem[] = [
     category: "AI工具",
     href: "/tools/ai-title",
     icon: "标",
+    keywords: ["标题生成", "爆款标题", "短视频标题", "小红书标题"],
     isLatest: true,
   },
   {
@@ -82,6 +89,7 @@ export const tools: ToolItem[] = [
     category: "AI工具",
     href: "/tools/ai-keywords",
     icon: "词",
+    keywords: ["关键词", "长尾词", "SEO词", "卖点词"],
   },
   {
     name: "图片压缩",
@@ -89,6 +97,7 @@ export const tools: ToolItem[] = [
     category: "图片工具",
     href: "/tools/image-compress",
     icon: "图",
+    keywords: ["图片变小", "压缩图片", "jpg压缩", "png压缩"],
     isPopular: true,
   },
   {
@@ -97,6 +106,7 @@ export const tools: ToolItem[] = [
     category: "图片工具",
     href: "/tools/image-resize",
     icon: "尺",
+    keywords: ["改尺寸", "修改宽高", "图片缩放", "电商图片尺寸"],
     isPopular: true,
   },
   {
@@ -105,6 +115,7 @@ export const tools: ToolItem[] = [
     category: "图片工具",
     href: "/tools/image-webp",
     icon: "WP",
+    keywords: ["webp转换", "图片格式转换", "jpg转webp", "png转webp"],
     isLatest: true,
   },
   {
@@ -243,6 +254,7 @@ export const tools: ToolItem[] = [
     category: "开发工具",
     href: "/tools/json-format",
     icon: "{}",
+    keywords: ["json美化", "json压缩", "json校验", "接口数据"],
     isPopular: true,
   },
   {
@@ -251,6 +263,7 @@ export const tools: ToolItem[] = [
     category: "开发工具",
     href: "/tools/base64",
     icon: "64",
+    keywords: ["base64解码", "base64编码", "文本编码"],
     isPopular: true,
   },
   {
@@ -259,6 +272,7 @@ export const tools: ToolItem[] = [
     category: "开发工具",
     href: "/tools/url-encode",
     icon: "URL",
+    keywords: ["url解码", "url编码", "参数解析", "链接编码"],
   },
   {
     name: "时间戳转换",
@@ -266,6 +280,45 @@ export const tools: ToolItem[] = [
     category: "开发工具",
     href: "/tools/timestamp",
     icon: "时",
+    keywords: ["unix时间", "毫秒时间戳", "日期转换"],
+    isLatest: true,
+  },
+  {
+    name: "颜色转换器",
+    description: "HEX、RGB、HSL 颜色值互转，并预览常用色板。",
+    category: "开发工具",
+    href: "/tools/color-converter",
+    icon: "色",
+    keywords: ["hex", "rgb", "hsl", "颜色值", "前端颜色", "色板"],
+    isLatest: true,
+  },
+  {
+    name: "随机密码生成器",
+    description: "生成安全密码、PIN 码和可复制的随机字符串。",
+    category: "开发工具",
+    href: "/tools/password-generator",
+    icon: "密",
+    keywords: ["密码", "随机字符串", "pin码", "安全密码", "token"],
+    isPopular: true,
+    isLatest: true,
+  },
+  {
+    name: "UUID生成器",
+    description: "批量生成 UUID v4，并支持复制和导出随机标识。",
+    category: "开发工具",
+    href: "/tools/uuid-generator",
+    icon: "ID",
+    keywords: ["uuid", "guid", "随机id", "唯一标识", "批量生成"],
+    isLatest: true,
+  },
+  {
+    name: "正则表达式测试器",
+    description: "测试正则匹配结果，查看分组、索引和替换预览。",
+    category: "开发工具",
+    href: "/tools/regex-tester",
+    icon: ".*",
+    keywords: ["regex", "regexp", "正则匹配", "正则替换", "表达式"],
+    isPopular: true,
     isLatest: true,
   },
   {
@@ -322,7 +375,10 @@ export const scenarioPacks: ScenarioPack[] = [
 ];
 
 export const popularTools = tools.filter((tool) => tool.isPopular).slice(0, 12);
-export const latestTools = tools.filter((tool) => tool.isLatest).slice(0, 6);
+export const latestTools = tools
+  .filter((tool) => tool.isLatest)
+  .slice(-6)
+  .reverse();
 
 export const toolsByCategory = categoryTabs.reduce<Record<ToolCategory, ToolItem[]>>(
   (groups, category) => {

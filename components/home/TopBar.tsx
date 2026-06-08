@@ -8,11 +8,11 @@ export function TopBar() {
             登录
           </a>
           <a href="/favorite" className="hover:text-accent-600">
-            收藏本站
+            常用工具
           </a>
-          <button className="hover:text-accent-600" type="button">
-            简体中文
-          </button>
+          <a className="hover:text-accent-600" href="/en">
+            English
+          </a>
         </div>
       </div>
     </div>

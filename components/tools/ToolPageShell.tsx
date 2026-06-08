@@ -2,6 +2,7 @@ import { AdBanner } from "@/components/home/AdBanner";
 import { Footer } from "@/components/home/Footer";
 import { Header } from "@/components/home/Header";
 import { TopBar } from "@/components/home/TopBar";
+import { ToolVisitTracker } from "@/components/tools/ToolVisitTracker";
 import type { ReactNode } from "react";
 
 type ToolPageShellProps = {
@@ -40,6 +41,7 @@ export function ToolPageShell({
 
   return (
     <main className="min-h-screen bg-slate-50">
+      <ToolVisitTracker category={category} description={description} title={title} />
       <script
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),

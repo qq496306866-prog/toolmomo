@@ -21,6 +21,46 @@ type OutputImage = {
 
 const presets: Preset[] = [
   {
+    id: "amazon-main",
+    name: "Amazon Main Image",
+    platform: "Amazon",
+    width: 2000,
+    height: 2000,
+    note: "Square product image for zoom-ready Amazon listings. Keep the product centered on a white background.",
+  },
+  {
+    id: "shopify-square",
+    name: "Shopify Product Square",
+    platform: "Shopify",
+    width: 2048,
+    height: 2048,
+    note: "High-resolution square product image for storefront collections and product detail pages.",
+  },
+  {
+    id: "etsy-listing",
+    name: "Etsy Listing Image",
+    platform: "Etsy",
+    width: 2000,
+    height: 1600,
+    note: "Landscape listing image ratio commonly used for Etsy search and product gallery previews.",
+  },
+  {
+    id: "ebay-gallery",
+    name: "eBay Gallery Image",
+    platform: "eBay",
+    width: 1600,
+    height: 1600,
+    note: "Square gallery image for marketplace search results and product pages.",
+  },
+  {
+    id: "walmart-main",
+    name: "Walmart Main Image",
+    platform: "Walmart",
+    width: 2000,
+    height: 2000,
+    note: "Retail-style square image for Walmart Marketplace product listings.",
+  },
+  {
     id: "taobao-main",
     name: "淘宝主图",
     platform: "淘宝",

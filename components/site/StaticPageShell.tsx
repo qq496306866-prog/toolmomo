@@ -6,9 +6,10 @@ type StaticPageShellProps = {
   title: string;
   description: string;
   children: React.ReactNode;
+  framed?: boolean;
 };
 
-export function StaticPageShell({ title, description, children }: StaticPageShellProps) {
+export function StaticPageShell({ title, description, children, framed = true }: StaticPageShellProps) {
   return (
     <main className="min-h-screen bg-slate-50">
       <TopBar />
@@ -27,9 +28,13 @@ export function StaticPageShell({ title, description, children }: StaticPageShel
         </div>
       </section>
       <section className="mx-auto max-w-[1200px] px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-md border border-slate-200 bg-white p-5 text-sm leading-7 text-slate-600 shadow-sm sm:p-7">
-          {children}
-        </div>
+        {framed ? (
+          <div className="rounded-md border border-slate-200 bg-white p-5 text-sm leading-7 text-slate-600 shadow-sm sm:p-7">
+            {children}
+          </div>
+        ) : (
+          children
+        )}
       </section>
       <Footer />
     </main>

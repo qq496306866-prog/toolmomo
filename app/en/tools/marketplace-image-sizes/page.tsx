@@ -18,12 +18,12 @@ const relatedTools = [
   },
   {
     name: "Image Compressor",
-    href: "/tools/image-compress",
+    href: "/en/tools/image-compress",
     description: "Compress JPG and PNG listing images.",
   },
   {
     name: "Image Resizer",
-    href: "/tools/image-resize",
+    href: "/en/tools/image-resize",
     description: "Resize images to fit storefront requirements.",
   },
 ];
@@ -36,7 +36,7 @@ export default function EnglishMarketplaceImageSizesPage() {
     >
       <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-8">
         <div className="space-y-5">
-          <EcommerceImagePresetTool />
+          <EcommerceImagePresetTool locale="en" />
           <InfoPanel
             items={[
               "Amazon, Walmart, eBay, and Shopify product images commonly work well as high-resolution square assets.",

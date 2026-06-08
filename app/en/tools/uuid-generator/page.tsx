@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const relatedTools = [
   { name: "Password Generator", href: "/en/tools/password-generator", description: "Generate secure passwords and random strings." },
   { name: "Regex Tester", href: "/en/tools/regex-tester", description: "Test regular expressions and replacements." },
-  { name: "Timestamp Converter", href: "/tools/timestamp", description: "Convert Unix timestamps and dates." },
+  { name: "Timestamp Converter", href: "/en/tools/timestamp", description: "Convert Unix timestamps and dates." },
 ];
 
 export default function EnglishUuidGeneratorPage() {

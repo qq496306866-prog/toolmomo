@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const relatedTools = [
   { name: "UUID Generator", href: "/en/tools/uuid-generator", description: "Generate UUID v4 identifiers in bulk." },
   { name: "Regex Tester", href: "/en/tools/regex-tester", description: "Test regular expressions and replacements." },
-  { name: "Base64 Encoder", href: "/tools/base64", description: "Encode and decode Base64 text." },
+  { name: "Base64 Encoder", href: "/en/tools/base64", description: "Encode and decode Base64 text." },
 ];
 
 export default function EnglishPasswordGeneratorPage() {

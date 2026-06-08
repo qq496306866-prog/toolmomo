@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 };
 
 const relatedTools = [
-  { name: "JSON Formatter", href: "/tools/json-format", description: "Format, validate, and minify JSON data." },
-  { name: "URL Encoder", href: "/tools/url-encode", description: "Encode, decode, and inspect URL parameters." },
-  { name: "Text Deduplicate", href: "/tools/text-deduplicate", description: "Remove duplicated lines from text lists." },
+  { name: "JSON Formatter", href: "/en/tools/json-format", description: "Format, validate, and minify JSON data." },
+  { name: "URL Encoder", href: "/en/tools/url-encode", description: "Encode, decode, and inspect URL parameters." },
+  { name: "Text Deduplicate", href: "/en/tools/text-deduplicate", description: "Remove duplicated lines from text lists." },
 ];
 
 export default function EnglishRegexTesterPage() {

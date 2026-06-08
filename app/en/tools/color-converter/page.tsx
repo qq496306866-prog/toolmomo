@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const relatedTools = [
   { name: "Regex Tester", href: "/en/tools/regex-tester", description: "Test regular expressions and replacements." },
-  { name: "JSON Formatter", href: "/tools/json-format", description: "Format, validate, and minify JSON data." },
+  { name: "JSON Formatter", href: "/en/tools/json-format", description: "Format, validate, and minify JSON data." },
   { name: "UUID Generator", href: "/en/tools/uuid-generator", description: "Generate UUID v4 identifiers in bulk." },
 ];
 

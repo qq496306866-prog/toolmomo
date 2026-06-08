@@ -23,7 +23,7 @@ const relatedTools = [
   },
   {
     name: "Image Compressor",
-    href: "/tools/image-compress",
+    href: "/en/tools/image-compress",
     description: "Compress listing images and storefront assets.",
   },
 ];

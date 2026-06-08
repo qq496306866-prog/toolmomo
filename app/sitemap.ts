@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { englishTools } from "@/data/toolsEn";
 import { readyToolPaths } from "@/data/readyTools";
 import { categoryTabs, scenarioPacks } from "@/data/tools";
 
@@ -7,17 +8,7 @@ const siteUrl = "https://toolmomo.com";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const staticPaths = ["/", "/tools", "/about", "/contact", "/privacy", "/disclaimer"];
-  const englishPaths = [
-    "/en",
-    "/en/tools",
-    "/en/tools/product-title",
-    "/en/tools/sku-helper",
-    "/en/tools/marketplace-image-sizes",
-    "/en/tools/color-converter",
-    "/en/tools/password-generator",
-    "/en/tools/uuid-generator",
-    "/en/tools/regex-tester",
-  ];
+  const englishPaths = ["/en", "/en/tools", ...englishTools.map((tool) => tool.href)];
   const categoryPaths = categoryTabs.map((category) => `/category/${encodeURIComponent(category)}`);
   const scenarioPaths = scenarioPacks.map((pack) => `/scenarios/${encodeURIComponent(pack.title)}`);
 

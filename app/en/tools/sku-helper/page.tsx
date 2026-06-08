@@ -22,7 +22,7 @@ const relatedTools = [
   },
   {
     name: "UUID Generator",
-    href: "/tools/uuid-generator",
+    href: "/en/tools/uuid-generator",
     description: "Generate random unique identifiers in bulk.",
   },
 ];

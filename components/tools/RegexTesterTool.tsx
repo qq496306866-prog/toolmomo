@@ -1,6 +1,48 @@
 "use client";
 
 import { useMemo, useState } from "react";
+type RegexTesterLocale = "zh" | "en";
+
+const regexText = {
+  zh: {
+    defaultReplacement: "[邮箱]",
+    fallbackError: "正则表达式格式不正确。",
+    pattern: "正则表达式",
+    sample: "测试文本",
+    replacement: "替换为",
+    options: "匹配选项",
+    global: "全局匹配 g",
+    ignoreCase: "忽略大小写 i",
+    multiline: "多行模式 m",
+    flags: "Flags",
+    matchCount: "匹配数",
+    results: "匹配结果",
+    index: "索引",
+    groups: "分组",
+    empty: "暂无匹配结果。",
+    preview: "替换预览",
+    previewPlaceholder: "替换结果会显示在这里",
+  },
+  en: {
+    defaultReplacement: "[email]",
+    fallbackError: "The regular expression format is invalid.",
+    pattern: "Regular expression",
+    sample: "Test text",
+    replacement: "Replace with",
+    options: "Match options",
+    global: "Global match g",
+    ignoreCase: "Ignore case i",
+    multiline: "Multiline m",
+    flags: "Flags",
+    matchCount: "Matches",
+    results: "Match results",
+    index: "Index",
+    groups: "Groups",
+    empty: "No matches yet.",
+    preview: "Replacement preview",
+    previewPlaceholder: "Replacement output will appear here",
+  },
+};
 
 type MatchItem = {
   value: string;
@@ -12,10 +54,13 @@ function buildRegex(pattern: string, flags: string) {
   return new RegExp(pattern, flags);
 }
 
-export function RegexTesterTool() {
+export function RegexTesterTool({ locale = "zh" }: { locale?: RegexTesterLocale }) {
+  const text = regexText[locale];
   const [pattern, setPattern] = useState("\\b\\w+@\\w+\\.\\w+\\b");
-  const [sample, setSample] = useState("联系邮箱：hello@toolmomo.com，备用邮箱：support@example.com");
-  const [replacement, setReplacement] = useState("[邮箱]");
+  const [sample, setSample] = useState(
+    locale === "en" ? "Contact: hello@toolmomo.com, backup: support@example.com" : "联系邮箱：hello@toolmomo.com，备用邮箱：support@example.com",
+  );
+  const [replacement, setReplacement] = useState(text.defaultReplacement);
   const [globalFlag, setGlobalFlag] = useState(true);
   const [ignoreCaseFlag, setIgnoreCaseFlag] = useState(false);
   const [multilineFlag, setMultilineFlag] = useState(false);
@@ -54,7 +99,7 @@ export function RegexTesterTool() {
       };
     } catch (error) {
       return {
-        error: error instanceof Error ? error.message : "正则表达式格式不正确。",
+        error: error instanceof Error ? error.message : text.fallbackError,
         matches: [],
         replaced: "",
       };
@@ -66,7 +111,7 @@ export function RegexTesterTool() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-4">
           <label className="block text-sm font-semibold text-slate-800" htmlFor="regex-pattern">
-            正则表达式
+            {text.pattern}
             <input
               className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 font-mono text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
               id="regex-pattern"
@@ -76,7 +121,7 @@ export function RegexTesterTool() {
             />
           </label>
           <label className="block text-sm font-semibold text-slate-800" htmlFor="regex-sample">
-            测试文本
+            {text.sample}
             <textarea
               className="mt-2 min-h-56 w-full resize-y rounded-md border border-slate-200 p-4 text-sm leading-7 outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
               id="regex-sample"
@@ -85,7 +130,7 @@ export function RegexTesterTool() {
             />
           </label>
           <label className="block text-sm font-semibold text-slate-800" htmlFor="regex-replacement">
-            替换为
+            {text.replacement}
             <input
               className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
               id="regex-replacement"
@@ -96,7 +141,7 @@ export function RegexTesterTool() {
         </div>
 
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">匹配选项</h2>
+          <h2 className="text-base font-bold text-slate-950">{text.options}</h2>
           <div className="mt-4 space-y-3">
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -105,7 +150,7 @@ export function RegexTesterTool() {
                 onChange={(event) => setGlobalFlag(event.target.checked)}
                 type="checkbox"
               />
-              全局匹配 g
+              {text.global}
             </label>
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -114,7 +159,7 @@ export function RegexTesterTool() {
                 onChange={(event) => setIgnoreCaseFlag(event.target.checked)}
                 type="checkbox"
               />
-              忽略大小写 i
+              {text.ignoreCase}
             </label>
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -123,16 +168,16 @@ export function RegexTesterTool() {
                 onChange={(event) => setMultilineFlag(event.target.checked)}
                 type="checkbox"
               />
-              多行模式 m
+              {text.multiline}
             </label>
           </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-md bg-white p-4">
-              <div className="text-xs font-semibold text-slate-500">Flags</div>
+              <div className="text-xs font-semibold text-slate-500">{text.flags}</div>
               <div className="mt-2 font-mono text-xl font-bold text-primary-700">/{flags || "-"}</div>
             </div>
             <div className="rounded-md bg-white p-4">
-              <div className="text-xs font-semibold text-slate-500">匹配数</div>
+              <div className="text-xs font-semibold text-slate-500">{text.matchCount}</div>
               <div className="mt-2 text-xl font-bold text-accent-600">{result.matches.length}</div>
             </div>
           </div>
@@ -147,27 +192,27 @@ export function RegexTesterTool() {
 
       <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">匹配结果</h2>
+          <h2 className="text-base font-bold text-slate-950">{text.results}</h2>
           <div className="mt-3 space-y-2">
             {result.matches.length ? (
               result.matches.map((match, index) => (
                 <div className="rounded-md bg-white p-3 text-sm" key={`${match.value}-${match.index}-${index}`}>
                   <div className="break-all font-mono font-bold text-primary-700">{match.value}</div>
-                  <div className="mt-1 text-xs text-slate-500">索引：{match.index}</div>
+                  <div className="mt-1 text-xs text-slate-500">{text.index}: {match.index}</div>
                   {match.groups.length ? (
-                    <div className="mt-2 text-xs leading-5 text-slate-600">分组：{match.groups.join(" / ")}</div>
+                    <div className="mt-2 text-xs leading-5 text-slate-600">{text.groups}: {match.groups.join(" / ")}</div>
                   ) : null}
                 </div>
               ))
             ) : (
-              <div className="rounded-md bg-white p-4 text-sm text-slate-500">暂无匹配结果。</div>
+              <div className="rounded-md bg-white p-4 text-sm text-slate-500">{text.empty}</div>
             )}
           </div>
         </div>
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">替换预览</h2>
+          <h2 className="text-base font-bold text-slate-950">{text.preview}</h2>
           <pre className="mt-3 min-h-40 whitespace-pre-wrap break-words rounded-md bg-white p-4 text-sm leading-7 text-slate-700">
-            {result.replaced || "替换结果会显示在这里"}
+            {result.replaced || text.previewPlaceholder}
           </pre>
         </div>
       </div>

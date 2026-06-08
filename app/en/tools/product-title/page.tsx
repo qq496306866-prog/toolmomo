@@ -47,7 +47,7 @@ export default function EnglishProductTitlePage() {
           />
         </div>
         <aside className="space-y-5">
-          <RelatedTools tools={relatedTools} />
+          <RelatedTools title="Related tools" tools={relatedTools} />
           <InfoPanel
             items={[
               "Avoid unsupported claims, keyword stuffing, and competitor brand names.",

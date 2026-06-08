@@ -9,6 +9,34 @@ type RgbColor = {
 };
 
 const presetColors = ["#2563eb", "#f97316", "#10b981", "#ef4444", "#111827", "#ffffff"];
+type ColorConverterLocale = "zh" | "en";
+
+const colorText = {
+  zh: {
+    copyAll: "复制全部",
+    copied: "已复制",
+    copyFailed: "复制失败",
+    inputLabel: "输入颜色值",
+    inputPlaceholder: "#2563eb 或 rgb(37, 99, 235)",
+    chooseColor: "选择颜色",
+    invalid: "暂时无法识别这个颜色值，请输入 HEX 或 RGB 格式。",
+    reset: "重置",
+    preview: "颜色预览",
+    note: "可用于 CSS、设计标注、品牌色整理和前端页面调色。",
+  },
+  en: {
+    copyAll: "Copy all",
+    copied: "Copied",
+    copyFailed: "Copy failed",
+    inputLabel: "Color value",
+    inputPlaceholder: "#2563eb or rgb(37, 99, 235)",
+    chooseColor: "Choose color",
+    invalid: "This color value cannot be recognized. Please enter a HEX or RGB value.",
+    reset: "Reset",
+    preview: "Color preview",
+    note: "Useful for CSS, design handoff, brand color docs, and frontend UI tuning.",
+  },
+};
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -96,9 +124,10 @@ function parseColor(text: string): RgbColor | null {
   return parseRgb(text);
 }
 
-export function ColorConverterTool() {
+export function ColorConverterTool({ locale = "zh" }: { locale?: ColorConverterLocale }) {
+  const text = colorText[locale];
   const [input, setInput] = useState("#2563eb");
-  const [copyText, setCopyText] = useState("复制全部");
+  const [copyText, setCopyText] = useState(text.copyAll);
 
   const result = useMemo(() => {
     const rgb = parseColor(input);
@@ -125,11 +154,11 @@ export function ColorConverterTool() {
 
     try {
       await navigator.clipboard.writeText([result.hex, result.rgbText, result.hslText].join("\n"));
-      setCopyText("已复制");
-      window.setTimeout(() => setCopyText("复制全部"), 1600);
+      setCopyText(text.copied);
+      window.setTimeout(() => setCopyText(text.copyAll), 1600);
     } catch {
-      setCopyText("复制失败");
-      window.setTimeout(() => setCopyText("复制全部"), 1600);
+      setCopyText(text.copyFailed);
+      window.setTimeout(() => setCopyText(text.copyAll), 1600);
     }
   };
 
@@ -138,20 +167,20 @@ export function ColorConverterTool() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div>
           <label className="text-sm font-semibold text-slate-800" htmlFor="color-input">
-            输入颜色值
+            {text.inputLabel}
           </label>
           <input
             className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 font-mono text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
             id="color-input"
             onChange={(event) => setInput(event.target.value)}
-            placeholder="#2563eb 或 rgb(37, 99, 235)"
+            placeholder={text.inputPlaceholder}
             value={input}
           />
 
           <div className="mt-4 flex flex-wrap gap-2">
             {presetColors.map((color) => (
               <button
-                aria-label={`选择颜色 ${color}`}
+                aria-label={`${text.chooseColor} ${color}`}
                 className="h-9 w-9 rounded-md border border-slate-200"
                 key={color}
                 onClick={() => setInput(color)}
@@ -178,7 +207,7 @@ export function ColorConverterTool() {
             </div>
           ) : (
             <div className="mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              暂时无法识别这个颜色值，请输入 HEX 或 RGB 格式。
+              {text.invalid}
             </div>
           )}
 
@@ -196,19 +225,19 @@ export function ColorConverterTool() {
               onClick={() => setInput("#2563eb")}
               type="button"
             >
-              重置
+              {text.reset}
             </button>
           </div>
         </div>
 
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">颜色预览</h2>
+          <h2 className="text-base font-bold text-slate-950">{text.preview}</h2>
           <div
             className="mt-4 h-44 rounded-md border border-slate-200"
             style={{ backgroundColor: result?.hex ?? "#f8fafc" }}
           />
           <div className="mt-4 rounded-md bg-white p-4 text-sm leading-6 text-slate-600">
-            可用于 CSS、设计标注、品牌色整理和前端页面调色。
+            {text.note}
           </div>
         </div>
       </div>

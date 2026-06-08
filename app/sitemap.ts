@@ -13,6 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/en/tools/product-title",
     "/en/tools/sku-helper",
     "/en/tools/marketplace-image-sizes",
+    "/en/tools/color-converter",
+    "/en/tools/password-generator",
+    "/en/tools/uuid-generator",
+    "/en/tools/regex-tester",
   ];
   const categoryPaths = categoryTabs.map((category) => `/category/${encodeURIComponent(category)}`);
   const scenarioPaths = scenarioPacks.map((pack) => `/scenarios/${encodeURIComponent(pack.title)}`);

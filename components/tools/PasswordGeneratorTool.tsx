@@ -6,6 +6,50 @@ const lowercase = "abcdefghijklmnopqrstuvwxyz";
 const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const numbers = "0123456789";
 const symbols = "!@#$%^&*()-_=+[]{};:,.?";
+type PasswordGeneratorLocale = "zh" | "en";
+
+const passwordText = {
+  zh: {
+    copyFirst: "复制第一条",
+    copied: "已复制",
+    copyFailed: "复制失败",
+    settings: "生成设置",
+    length: "长度",
+    lowercase: "小写字母",
+    uppercase: "大写字母",
+    numbers: "数字",
+    symbols: "符号",
+    strength: "强度参考",
+    strong: "强",
+    medium: "中",
+    basic: "基础",
+    generate: "生成密码",
+    option: "方案",
+    clickGenerate: "点击生成密码",
+    waiting: "等待生成",
+    note: "密码在浏览器本地使用加密随机数生成，不会发送到服务器。建议为不同网站使用不同密码，并配合密码管理器保存。",
+  },
+  en: {
+    copyFirst: "Copy first",
+    copied: "Copied",
+    copyFailed: "Copy failed",
+    settings: "Generator settings",
+    length: "Length",
+    lowercase: "Lowercase letters",
+    uppercase: "Uppercase letters",
+    numbers: "Numbers",
+    symbols: "Symbols",
+    strength: "Strength estimate",
+    strong: "Strong",
+    medium: "Medium",
+    basic: "Basic",
+    generate: "Generate passwords",
+    option: "Option",
+    clickGenerate: "Click generate",
+    waiting: "Waiting",
+    note: "Passwords are generated locally in your browser with cryptographic randomness. Use unique passwords for different sites and store them in a password manager.",
+  },
+};
 
 function randomIndex(max: number) {
   const values = new Uint32Array(1);
@@ -28,28 +72,30 @@ function shuffle(text: string[]) {
   return next.join("");
 }
 
-function getStrength(length: number, poolCount: number) {
+function getStrength(length: number, poolCount: number, locale: PasswordGeneratorLocale) {
+  const text = passwordText[locale];
   const score = length + poolCount * 4;
 
   if (score >= 32) {
-    return { label: "强", className: "text-emerald-700 bg-emerald-50" };
+    return { label: text.strong, className: "text-emerald-700 bg-emerald-50" };
   }
 
   if (score >= 22) {
-    return { label: "中", className: "text-amber-700 bg-amber-50" };
+    return { label: text.medium, className: "text-amber-700 bg-amber-50" };
   }
 
-  return { label: "基础", className: "text-slate-600 bg-slate-100" };
+  return { label: text.basic, className: "text-slate-600 bg-slate-100" };
 }
 
-export function PasswordGeneratorTool() {
+export function PasswordGeneratorTool({ locale = "zh" }: { locale?: PasswordGeneratorLocale }) {
+  const text = passwordText[locale];
   const [length, setLength] = useState(16);
   const [useLowercase, setUseLowercase] = useState(true);
   const [useUppercase, setUseUppercase] = useState(true);
   const [useNumbers, setUseNumbers] = useState(true);
   const [useSymbols, setUseSymbols] = useState(true);
   const [passwords, setPasswords] = useState<string[]>([]);
-  const [copyText, setCopyText] = useState("复制第一条");
+  const [copyText, setCopyText] = useState(text.copyFirst);
 
   const pools = useMemo(() => {
     return [
@@ -60,7 +106,7 @@ export function PasswordGeneratorTool() {
     ].filter(Boolean);
   }, [useLowercase, useNumbers, useSymbols, useUppercase]);
 
-  const strength = getStrength(length, pools.length);
+  const strength = getStrength(length, pools.length, locale);
 
   const generatePassword = () => {
     const safeLength = Math.max(length, pools.length);
@@ -81,7 +127,7 @@ export function PasswordGeneratorTool() {
     }
 
     setPasswords(Array.from({ length: 6 }, generatePassword));
-    setCopyText("复制第一条");
+    setCopyText(text.copyFirst);
   };
 
   const copyFirst = async () => {
@@ -91,11 +137,11 @@ export function PasswordGeneratorTool() {
 
     try {
       await navigator.clipboard.writeText(passwords[0]);
-      setCopyText("已复制");
-      window.setTimeout(() => setCopyText("复制第一条"), 1600);
+      setCopyText(text.copied);
+      window.setTimeout(() => setCopyText(text.copyFirst), 1600);
     } catch {
-      setCopyText("复制失败");
-      window.setTimeout(() => setCopyText("复制第一条"), 1600);
+      setCopyText(text.copyFailed);
+      window.setTimeout(() => setCopyText(text.copyFirst), 1600);
     }
   };
 
@@ -103,10 +149,10 @@ export function PasswordGeneratorTool() {
     <section className="rounded-md border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <h2 className="text-base font-bold text-slate-950">生成设置</h2>
+          <h2 className="text-base font-bold text-slate-950">{text.settings}</h2>
 
           <label className="mt-4 block text-sm font-semibold text-slate-700" htmlFor="password-length">
-            长度：{length}
+            {text.length}: {length}
           </label>
           <input
             className="mt-2 w-full accent-accent-500"
@@ -126,7 +172,7 @@ export function PasswordGeneratorTool() {
                 onChange={(event) => setUseLowercase(event.target.checked)}
                 type="checkbox"
               />
-              小写字母
+              {text.lowercase}
             </label>
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -135,7 +181,7 @@ export function PasswordGeneratorTool() {
                 onChange={(event) => setUseUppercase(event.target.checked)}
                 type="checkbox"
               />
-              大写字母
+              {text.uppercase}
             </label>
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -144,7 +190,7 @@ export function PasswordGeneratorTool() {
                 onChange={(event) => setUseNumbers(event.target.checked)}
                 type="checkbox"
               />
-              数字
+              {text.numbers}
             </label>
             <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
               <input
@@ -153,12 +199,12 @@ export function PasswordGeneratorTool() {
                 onChange={(event) => setUseSymbols(event.target.checked)}
                 type="checkbox"
               />
-              符号
+              {text.symbols}
             </label>
           </div>
 
           <div className="mt-5 flex items-center justify-between rounded-md bg-white p-3">
-            <span className="text-sm font-semibold text-slate-600">强度参考</span>
+            <span className="text-sm font-semibold text-slate-600">{text.strength}</span>
             <span className={`rounded-md px-3 py-1 text-sm font-bold ${strength.className}`}>{strength.label}</span>
           </div>
 
@@ -168,7 +214,7 @@ export function PasswordGeneratorTool() {
               onClick={generate}
               type="button"
             >
-              生成密码
+              {text.generate}
             </button>
             <button
               className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
@@ -182,17 +228,17 @@ export function PasswordGeneratorTool() {
 
         <div>
           <div className="grid grid-cols-1 gap-3">
-            {(passwords.length ? passwords : Array.from({ length: 6 }, (_, index) => (index === 0 ? "点击生成密码" : "等待生成"))).map(
+            {(passwords.length ? passwords : Array.from({ length: 6 }, (_, index) => (index === 0 ? text.clickGenerate : text.waiting))).map(
               (password, index) => (
                 <div className="rounded-md border border-slate-200 bg-slate-50 p-4" key={`${password}-${index}`}>
-                  <div className="text-xs font-semibold text-slate-500">方案 {index + 1}</div>
+                  <div className="text-xs font-semibold text-slate-500">{text.option} {index + 1}</div>
                   <div className="mt-2 break-all font-mono text-lg font-bold text-primary-700">{password}</div>
                 </div>
               ),
             )}
           </div>
           <div className="mt-4 rounded-md border border-primary-100 bg-primary-50 p-4 text-sm leading-6 text-primary-800">
-            密码在浏览器本地使用加密随机数生成，不会发送到服务器。建议为不同网站使用不同密码，并配合密码管理器保存。
+            {text.note}
           </div>
         </div>
       </div>

@@ -46,7 +46,7 @@ export default function EnglishSkuHelperPage() {
           />
         </div>
         <aside className="space-y-5">
-          <RelatedTools tools={relatedTools} />
+          <RelatedTools title="Related tools" tools={relatedTools} />
           <InfoPanel
             items={[
               "Keep platform-facing variant names customer-friendly.",

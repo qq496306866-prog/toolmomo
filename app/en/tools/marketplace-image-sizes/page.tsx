@@ -47,7 +47,7 @@ export default function EnglishMarketplaceImageSizesPage() {
           />
         </div>
         <aside className="space-y-5">
-          <RelatedTools tools={relatedTools} />
+          <RelatedTools title="Related tools" tools={relatedTools} />
           <InfoPanel
             items={[
               "Images are processed locally in your browser.",

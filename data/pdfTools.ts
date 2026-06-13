@@ -16,7 +16,8 @@ export type PdfLocalOperation =
   | "add-watermark"
   | "add-text"
   | "annotate"
-  | "esign";
+  | "esign"
+  | "remove-annotations";
 
 export type PdfToolDefinition = {
   slug: string;
@@ -60,12 +61,12 @@ const remote = (
 
 export const pdfTools: PdfToolDefinition[] = [
   local("edit-pdf", "Edit PDF", "Add text, notes, signatures, and simple marks to a PDF.", "PDF", "edit", ".pdf,application/pdf", "pdf", { popular: true }),
-  remote("pdf-to-word", "PDF to Word", "Convert a PDF to an editable Word document.", "DOC", "pdfco", ".pdf,application/pdf", "docx", "pdf", "/v1/pdf/convert/to/doc", { popular: true }),
+  remote("pdf-to-word", "PDF to Word", "Convert a PDF to an editable Word document.", "DOC", "cloudconvert", ".pdf,application/pdf", "docx", "pdf", undefined, { popular: true }),
   local("jpg-to-pdf", "JPG to PDF", "Combine JPG images into a single PDF.", "JPG", "images-to-pdf", ".jpg,.jpeg,image/jpeg", "pdf", { multiple: true, popular: true }),
   local("pdf-merge", "Merge PDF", "Merge two or more PDF files in your chosen order.", "PDF", "merge", ".pdf,application/pdf", "pdf", { multiple: true, popular: true }),
   local("create-pdf", "Create PDF", "Create a clean PDF document from text.", "NEW", "create", "", "pdf"),
   local("pdf-to-jpg", "PDF to JPG", "Render every PDF page as a JPG image.", "JPG", "pdf-to-image", ".pdf,application/pdf", "jpg", { popular: true }),
-  remote("compress-pdf", "Compress PDF", "Reduce PDF file size while preserving readability.", "ZIP", "pdfco", ".pdf,application/pdf", "pdf", "pdf", "/v1/pdf/optimize", { popular: true }),
+  remote("compress-pdf", "Compress PDF", "Reduce PDF file size while preserving readability.", "ZIP", "pdfco", ".pdf,application/pdf", "pdf", "pdf", "/v2/pdf/compress", { popular: true }),
   remote("word-to-pdf", "Word to PDF", "Convert DOC or DOCX documents to PDF.", "DOC", "cloudconvert", ".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document", "pdf", "docx"),
   local("pdf-split", "Split PDF", "Split selected page ranges into separate PDF files.", "CUT", "split", ".pdf,application/pdf", "pdf", { popular: true }),
   remote("unlock-pdf", "Unlock PDF", "Remove PDF password protection when you know the password.", "KEY", "pdfco", ".pdf,application/pdf", "pdf", "pdf", "/v1/pdf/security/remove"),
@@ -85,8 +86,8 @@ export const pdfTools: PdfToolDefinition[] = [
   local("pdf-page-deleter", "PDF Page Deleter", "Remove selected pages from a PDF.", "DEL", "delete-pages", ".pdf,application/pdf", "pdf"),
   remote("url-to-pdf", "URL to PDF", "Capture a public web page as a PDF.", "URL", "pdfco", "", "pdf", undefined, "/v1/pdf/convert/from/url"),
   local("rotate-pdf", "Rotate PDF", "Rotate all or selected PDF pages.", "ROT", "rotate", ".pdf,application/pdf", "pdf"),
-  remote("extract-images-pdf", "Extract Images PDF", "Extract embedded images from a PDF.", "IMG", "pdfco", ".pdf,application/pdf", "zip", "pdf", "/v1/pdf/convert/to/images"),
-  remote("pdf-watermark-remover", "PDF Watermark Remover", "Remove removable watermark annotations or overlay objects.", "WM", "pdfco", ".pdf,application/pdf", "pdf", "pdf", "/v1/pdf/edit/delete-annotations", { note: "Watermarks baked into scanned page images cannot be removed reliably." }),
+  local("extract-images-pdf", "Extract Images PDF", "Render PDF pages as PNG images and download them as an archive.", "IMG", "pdf-to-image", ".pdf,application/pdf", "png", { note: "This exports rendered pages. It does not recover original embedded image files." }),
+  local("pdf-watermark-remover", "PDF Watermark Remover", "Remove annotation-based watermarks and comments from a PDF.", "WM", "remove-annotations", ".pdf,application/pdf", "pdf", { note: "Only annotation-based watermarks are removed. Watermarks baked into page content or scanned images remain." }),
   remote("pdf-to-csv", "PDF to CSV", "Extract PDF tables into CSV files.", "CSV", "pdfco", ".pdf,application/pdf", "csv", "pdf", "/v1/pdf/convert/to/csv"),
   local("add-numbers-to-pdf", "Add Numbers to PDF", "Add page numbers to each page of a PDF.", "123", "add-page-numbers", ".pdf,application/pdf", "pdf"),
   local("add-watermark", "Add Watermark", "Stamp text across each PDF page.", "WM", "add-watermark", ".pdf,application/pdf", "pdf"),
@@ -102,7 +103,7 @@ export const pdfTools: PdfToolDefinition[] = [
   remote("webp-to-pdf", "WEBP to PDF", "Convert a WEBP image to PDF.", "WEBP", "cloudconvert", ".webp,image/webp", "pdf", "webp"),
   remote("pdf-to-azw3", "PDF to AZW3", "Convert a PDF document to AZW3.", "AZW3", "cloudconvert", ".pdf,application/pdf", "azw3", "pdf"),
   remote("ms-outlook-to-pdf", "MS Outlook to PDF", "Convert MSG or EML email files to PDF.", "MSG", "pdfco", ".msg,.eml,application/vnd.ms-outlook,message/rfc822", "pdf", "msg", "/v1/pdf/convert/from/email"),
-  local("pdf-to-text", "PDF to Text", "Convert selectable PDF text into a plain text file.", "TXT", "extract-text", ".pdf,application/pdf", "txt"),
+  remote("pdf-to-text", "PDF to Text", "Convert PDF text and scanned pages into a plain text file with OCR.", "TXT", "pdfco", ".pdf,application/pdf", "txt", "pdf", "/v1/pdf/convert/to/text"),
   remote("gif-to-pdf", "GIF to PDF", "Convert a GIF image to PDF.", "GIF", "cloudconvert", ".gif,image/gif", "pdf", "gif"),
   remote("eps-to-pdf", "EPS to PDF", "Convert EPS artwork to PDF.", "EPS", "cloudconvert", ".eps,application/postscript", "pdf", "eps"),
 ];

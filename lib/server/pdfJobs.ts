@@ -127,7 +127,7 @@ async function runPdfCo(job: PdfJob) {
   const tool = getPdfTool(job.tool); if (!tool?.endpoint) throw new Error("PDF.co endpoint is missing for this tool.");
   const isUrlTool = job.tool === "url-to-pdf";
   const sourceUrl = isUrlTool ? String(job.options.url || "") : await uploadPdfCo(job.inputFiles[0], key);
-  const body: Record<string, unknown> = { url: sourceUrl, async: false, name: `${job.tool}.${tool.outputFormat}` };
+  const body: Record<string, unknown> = { url: sourceUrl, async: false, inline: false, expiration: 60, name: `${job.tool}.${tool.outputFormat}` };
   if (job.tool === "unlock-pdf") body.password = String(job.options.password || "");
   if (job.tool === "protect-pdf") { body.ownerPassword = String(job.options.password || ""); body.userPassword = String(job.options.password || ""); }
   const response = await fetch(`https://api.pdf.co${tool.endpoint}`, { method: "POST", headers: { "x-api-key": key, "content-type": "application/json" }, body: JSON.stringify(body), cache: "no-store" });
@@ -167,10 +167,10 @@ async function runDeepL(job: PdfJob) {
   const response = await fetch(`${base}/v2/document`, { method: "POST", headers: { Authorization: `DeepL-Auth-Key ${key}` }, body: form });
   const created = await response.json() as { document_id?: string; document_key?: string; message?: string };
   if (!response.ok || !created.document_id || !created.document_key) throw new Error(created.message || "DeepL document upload failed.");
-  const statusBody = new URLSearchParams({ document_key: created.document_key });
+  const documentBody = JSON.stringify({ document_key: created.document_key });
   for (let attempt = 0; attempt < 120; attempt += 1) {
     await new Promise((resolve) => setTimeout(resolve, 1500));
-    const status = await fetch(`${base}/v2/document/${created.document_id}`, { method: "POST", headers: { Authorization: `DeepL-Auth-Key ${key}`, "content-type": "application/x-www-form-urlencoded" }, body: statusBody });
+    const status = await fetch(`${base}/v2/document/${created.document_id}`, { method: "POST", headers: { Authorization: `DeepL-Auth-Key ${key}`, "content-type": "application/json" }, body: documentBody });
     const current = await status.json() as { status?: string; message?: string };
     if (current.status === "error") throw new Error(current.message || "DeepL translation failed.");
     if (current.status === "done") return { url: `${base}/v2/document/${created.document_id}/result`, name: "translated.pdf", deepLKey: created.document_key };
@@ -185,7 +185,7 @@ export async function processJob(id: string) {
     const remote = job.provider === "pdfco" ? await runPdfCo(job) : job.provider === "cloudconvert" ? await runCloudConvert(job) : await runDeepL(job);
     if ((await readJob(id))?.status === "cancelled") return;
     let response: Response;
-    if ("deepLKey" in remote) response = await fetch(remote.url, { method: "POST", headers: { Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`, "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ document_key: remote.deepLKey as string }) });
+    if ("deepLKey" in remote) response = await fetch(remote.url, { method: "POST", headers: { Authorization: `DeepL-Auth-Key ${process.env.DEEPL_API_KEY}`, "content-type": "application/json" }, body: JSON.stringify({ document_key: remote.deepLKey }) });
     else response = await fetch(remote.url);
     if (!response.ok) throw new Error("The provider result could not be downloaded.");
     if ((await readJob(id))?.status === "cancelled") return;

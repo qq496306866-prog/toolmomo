@@ -14,10 +14,10 @@ Last updated: 2026-06-13
 
 ## Processing
 
-- Local tools: 20.
-- Remote tools: 26.
-- PDF.co tools: 10.
-- CloudConvert tools: 15.
+- Local tools: 21.
+- Remote tools: 25.
+- PDF.co tools: 8.
+- CloudConvert tools: 16.
 - DeepL tools: 1.
 
 Remote jobs use random UUIDs, server-only API keys, a 50 MB total limit, a

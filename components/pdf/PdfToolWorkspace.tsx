@@ -109,7 +109,7 @@ export function PdfToolWorkspace({ tool }: { tool: PdfToolDefinition }) {
     const operation = tool.localOperation;
     if (!operation) return;
     if (operation !== "create" && !files.length) throw new Error("Choose a file first.");
-    const { PDFDocument, StandardFonts, degrees, rgb } = await import("pdf-lib");
+    const { PDFDocument, PDFName, StandardFonts, degrees, rgb } = await import("pdf-lib");
 
     if (operation === "images-to-pdf") {
       const output = await PDFDocument.create();
@@ -159,6 +159,10 @@ export function PdfToolWorkspace({ tool }: { tool: PdfToolDefinition }) {
     }
 
     const source = await PDFDocument.load(await files[0].arrayBuffer());
+    if (operation === "remove-annotations") {
+      source.getPages().forEach((page) => page.node.delete(PDFName.of("Annots")));
+      publish([{ name: `${tool.slug}.pdf`, blob: new Blob([asBuffer(await source.save())], { type: "application/pdf" }) }]); return;
+    }
     if (operation === "split") {
       const outputs: Array<{ name: string; blob: Blob }> = [];
       for (const [index, pageIndex] of parsePageList(pages, source.getPageCount()).entries()) { const output = await PDFDocument.create(); const [page] = await output.copyPages(source, [pageIndex]); output.addPage(page); outputs.push({ name: `page-${index + 1}.pdf`, blob: new Blob([asBuffer(await output.save())], { type: "application/pdf" }) }); }

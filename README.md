@@ -9,9 +9,9 @@ redirect to their canonical root URLs.
 ## Product scope
 
 - 46 PDF tool routes from one catalog in `data/pdfTools.ts`.
-- 20 browser-local tools for editing, merging, splitting, rendering, signing,
+- 21 browser-local tools for editing, merging, splitting, rendering, signing,
   page management, text extraction, and image/PDF creation.
-- 26 remote tools using PDF.co, CloudConvert, or DeepL.
+- 25 remote tools using PDF.co, CloudConvert, or DeepL.
 - Unified upload, validation, processing, error, result, ZIP, and download UI.
 - 50 MB and 100-page limits.
 - Five remote jobs per IP per UTC day.

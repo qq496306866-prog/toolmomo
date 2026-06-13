@@ -1,3 +1,5 @@
+import { AdSenseUnit } from "@/components/ads/AdSenseUnit";
 import { EnglishShell } from "@/components/en/EnglishShell";
-import { writeTools } from "@/data/writeTools";
-export default function WriteToolsPage() { return <EnglishShell title="Write Tools" description="Private browser-based tools for counting, cleaning, sorting, and transforming text."><section className="mx-auto max-w-[1220px] px-5 py-12"><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{writeTools.map((tool) => <a className="flex min-h-[126px] gap-4 rounded-[18px] border border-[#e3eaf2] bg-white p-5 hover:border-[#c4adef]" href={`/tools/write/${tool.slug}`} key={tool.slug}><span className="grid h-14 w-14 shrink-0 place-items-center rounded-[14px] bg-[#f1ebfc] text-xs font-black text-[#6842b5]">{tool.icon}</span><span><span className="text-lg font-black">{tool.name}</span><span className="mt-2 block text-sm font-semibold leading-6 text-[#728197]">{tool.description}</span></span></a>)}</div></section></EnglishShell>; }
+import { ToolCatalog } from "@/components/site/ToolCatalog";
+import { writeCatalog } from "@/lib/catalogTools";
+export default function WriteToolsPage() { return <EnglishShell title="Write Tools" description="Use private browser text utilities or AI-assisted writing tools powered by the configured provider."><section className="mx-auto max-w-[1220px] px-5 pt-10"><AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_CATEGORY_SLOT} /></section><section className="mx-auto max-w-[1220px] px-5 py-10"><ToolCatalog tools={writeCatalog} /></section></EnglishShell>; }

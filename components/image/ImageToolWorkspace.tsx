@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ImageToolDefinition } from "@/data/imageTools";
+import { trackToolEvent } from "@/lib/clientAnalytics";
 
 const MAX_BYTES = 50 * 1024 * 1024;
 const MAX_PIXELS = 40_000_000;
@@ -18,6 +19,31 @@ type LocalImageTool = Extract<ImageToolDefinition, { provider: "local" }>;
 function canvasBlob(canvas: HTMLCanvasElement, format: LocalImageTool["outputFormat"], quality: number) {
   const mime = format === "jpg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
   return new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("The browser could not encode this image.")), mime, quality));
+}
+
+function sharpenCanvas(context: CanvasRenderingContext2D, width: number, height: number, strength: number) {
+  const source = context.getImageData(0, 0, width, height); const output = context.createImageData(width, height); output.data.set(source.data); const mix = Math.min(1, strength / 100); const kernel = [0, -mix, 0, -mix, 1 + 4 * mix, -mix, 0, -mix, 0];
+  for (let y = 1; y < height - 1; y += 1) for (let x = 1; x < width - 1; x += 1) for (let channel = 0; channel < 3; channel += 1) { let value = 0; for (let ky = -1; ky <= 1; ky += 1) for (let kx = -1; kx <= 1; kx += 1) value += source.data[((y + ky) * width + x + kx) * 4 + channel] * kernel[(ky + 1) * 3 + kx + 1]; output.data[(y * width + x) * 4 + channel] = Math.max(0, Math.min(255, value)); }
+  context.putImageData(output, 0, 0);
+}
+
+async function readBasicExif(file: File) {
+  if (!/jpe?g/i.test(file.type) && !/\.jpe?g$/i.test(file.name)) return {};
+  const view = new DataView(await file.arrayBuffer());
+  try {
+    let offset = 2;
+    while (offset + 4 < view.byteLength) {
+      if (view.getUint8(offset) !== 0xff) break;
+      const marker = view.getUint8(offset + 1); const length = view.getUint16(offset + 2, false);
+      if (marker === 0xe1 && view.getUint32(offset + 4, false) === 0x45786966) {
+        const tiff = offset + 10; const little = view.getUint16(tiff, false) === 0x4949; const get16 = (at: number) => view.getUint16(at, little); const get32 = (at: number) => view.getUint32(at, little); const result: Record<string, string | number> = {};
+        const readIfd = (start: number) => { const count = get16(start); for (let index = 0; index < count; index += 1) { const entry = start + 2 + index * 12; const tag = get16(entry); const type = get16(entry + 2); const countValue = get32(entry + 4); const valueOffset = type === 2 && countValue > 4 ? tiff + get32(entry + 8) : entry + 8; const label = tag === 0x010f ? "cameraMake" : tag === 0x0110 ? "cameraModel" : tag === 0x0132 ? "dateTime" : tag === 0x0112 ? "orientation" : ""; if (!label) continue; result[label] = type === 2 ? Array.from({ length: Math.max(0, countValue - 1) }, (_, item) => String.fromCharCode(view.getUint8(valueOffset + item))).join("") : get16(valueOffset); } };
+        readIfd(tiff + get32(tiff + 4)); return result;
+      }
+      offset += 2 + length;
+    }
+  } catch { return {}; }
+  return {};
 }
 
 export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
@@ -58,11 +84,12 @@ export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
 
   const run = async () => {
     if (!files.length) { setMessage("Choose an image first."); return; }
+    trackToolEvent("tool_start", tool.slug, "image");
     setWorking(true); setMessage("Processing in your browser...");
     try {
       if (tool.operation === "metadata") {
         const image = await loadImage(files[0]);
-        const metadata = { name: files[0].name, type: files[0].type || "unknown", bytes: files[0].size, width: image.width, height: image.height, lastModified: new Date(files[0].lastModified).toISOString() };
+        const metadata = { name: files[0].name, type: files[0].type || "unknown", bytes: files[0].size, width: image.width, height: image.height, megapixels: Number(((image.width * image.height) / 1_000_000).toFixed(2)), aspectRatio: Number((image.width / image.height).toFixed(4)), lastModified: new Date(files[0].lastModified).toISOString(), ...(await readBasicExif(files[0])) };
         image.bitmap.close();
         const blob = new Blob([JSON.stringify(metadata, null, 2)], { type: "application/json" });
         setOutput({ blob, url: URL.createObjectURL(blob), name: "image-metadata.json" }); setMessage("Metadata is ready."); return;
@@ -113,11 +140,13 @@ export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
             : tool.effect === "invert" ? `invert(${Math.min(100, strength)}%)`
               : tool.effect === "blur" ? `blur(${Math.min(30, strength / 3)}px)`
                 : tool.effect === "brightness" ? `brightness(${50 + strength * 1.5}%)`
-                  : tool.effect === "contrast" || tool.effect === "sharpen" ? `contrast(${75 + strength * 1.75}%)`
+                    : tool.effect === "contrast" ? `contrast(${75 + strength * 1.75}%)`
+                      : tool.effect === "sharpen" ? "none"
                     : `saturate(${strength * 2}%)`;
         }
         context.drawImage(first.bitmap, 0, 0);
         context.filter = "none";
+        if (tool.operation === "filter" && tool.effect === "sharpen") sharpenCanvas(context, canvas.width, canvas.height, amount);
         if (tool.operation === "text") { context.font = `900 ${Math.max(16, amount * 2)}px Arial`; context.fillStyle = color; context.textBaseline = "bottom"; context.fillText(text, 30, canvas.height - 30); }
         if (tool.operation === "meme") {
           const [top = "TOP TEXT", bottom = "BOTTOM TEXT"] = text.split("|");
@@ -147,8 +176,8 @@ export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
       const blob = await canvasBlob(canvas, tool.outputFormat, quality / 100);
       loaded.forEach((image) => image.bitmap.close());
       const name = `${tool.slug}.${tool.outputFormat}`;
-      setOutput({ blob, url: URL.createObjectURL(blob), name }); setMessage("Your image is ready to download.");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Image processing failed."); }
+      setOutput({ blob, url: URL.createObjectURL(blob), name }); setMessage("Your image is ready to download."); trackToolEvent("tool_success", tool.slug, "image");
+    } catch (error) { const detail = error instanceof Error ? error.message : "Image processing failed."; trackToolEvent("tool_error", tool.slug, "image", detail); setMessage(detail); }
     finally { setWorking(false); }
   };
 
@@ -163,7 +192,7 @@ export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
       {["border", "text", "watermark", "transparent"].includes(tool.operation) ? <label className="text-sm font-black">{tool.operation === "transparent" ? "Color to remove" : "Color"}<input className="mt-2 block h-12 w-full rounded-[12px] border p-1" onChange={(event) => setColor(event.target.value)} type="color" value={color} /></label> : null}
     </div>
     {message ? <div className="mt-5 rounded-[14px] bg-[#eef9f7] px-4 py-3 text-sm font-bold text-[#15766f]">{message}</div> : null}
-    <div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#14948f] px-7 py-3 text-sm font-black text-white disabled:opacity-50" disabled={working} onClick={run} type="button">{working ? "Processing..." : `Run ${tool.name}`}</button>{output ? <a className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" download={output.name} href={output.url}>Download result</a> : null}</div>
+    <div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#14948f] px-7 py-3 text-sm font-black text-white disabled:opacity-50" disabled={working} onClick={run} type="button">{working ? "Processing..." : `Run ${tool.name}`}</button>{output ? <a className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" download={output.name} href={output.url} onClick={() => trackToolEvent("download_result", tool.slug, "image")}>Download result</a> : null}</div>
     {output && output.blob.type.startsWith("image/") ? <div className="mt-6 overflow-hidden rounded-[18px] bg-[linear-gradient(45deg,#eef2f6_25%,transparent_25%),linear-gradient(-45deg,#eef2f6_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#eef2f6_75%),linear-gradient(-45deg,transparent_75%,#eef2f6_75%)] bg-[length:24px_24px] bg-[position:0_0,0_12px,12px_-12px,-12px_0]"><img alt="Processed result" className="mx-auto max-h-[520px] max-w-full object-contain" src={output.url} /></div> : null}
   </div>;
 }

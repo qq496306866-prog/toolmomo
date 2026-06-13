@@ -9,6 +9,15 @@ the create-job response has been returned.
 Create `/var/www/toolmomo/.env.production` and set:
 
 ```text
+NEXT_PUBLIC_GA_ID=G-CQBC5LZQC3
+NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1935746779426009
+NEXT_PUBLIC_ADSENSE_HOME_SLOT=
+NEXT_PUBLIC_ADSENSE_CATEGORY_SLOT=
+NEXT_PUBLIC_ADSENSE_TOOL_SLOT=
+AI_PROVIDER=apimart
+APIMART_API_KEY=
+APIMART_BASE_URL=https://api.apimart.ai/v1
+APIMART_TEXT_MODEL=gpt-5.2-pro
 PDFCO_API_KEY=
 CLOUDCONVERT_API_KEY=
 DEEPL_API_KEY=
@@ -51,9 +60,24 @@ curl -I http://127.0.0.1:3000/
 curl -I http://127.0.0.1:3000/tools
 curl -I http://127.0.0.1:3000/en
 curl -I http://127.0.0.1:3000/sitemap.xml
+curl -i http://127.0.0.1:3000/ads.txt
 pm2 status
 pm2 logs toolmomo --lines 100
 ```
 
 Nginx should proxy `toolmomo.com` to `127.0.0.1:3000`. Use the supplied
 `nginx-toolmomo.conf`, test with `sudo nginx -t`, then reload Nginx.
+
+## AdSense launch checklist
+
+1. Create responsive display units named `Toolmomo Home`, `Toolmomo Category`,
+   and `Toolmomo Tool`, then place their slot IDs in `.env.production`.
+2. In AdSense Auto ads, enable Anchor and Side rail formats only. Disable
+   Vignette and automatic in-page placement because TOOLMOMO uses controlled
+   manual slots around tool workflows.
+3. In Privacy & messaging, publish a Google-certified European regulations
+   message for EEA, UK, and Switzerland and a US states message where offered.
+4. Verify the footer Cookie Settings button reopens the consent choices.
+5. Confirm `/ads.txt` is authorized in AdSense before evaluating fill rate.
+6. Use Tag Assistant to verify denied defaults before consent and granted
+   updates after consent. Never create analytics events for ad clicks.

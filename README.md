@@ -26,6 +26,11 @@ npm run build
 ## Provider configuration
 
 ```text
+NEXT_PUBLIC_GA_ID=G-CQBC5LZQC3
+NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-1935746779426009
+NEXT_PUBLIC_ADSENSE_HOME_SLOT=
+NEXT_PUBLIC_ADSENSE_CATEGORY_SLOT=
+NEXT_PUBLIC_ADSENSE_TOOL_SLOT=
 AI_PROVIDER=apimart
 APIMART_API_KEY=
 APIMART_BASE_URL=https://api.apimart.ai/v1
@@ -39,4 +44,4 @@ RATE_LIMIT_SALT=replace-with-a-long-random-secret
 ```
 
 Provider keys are server-only. See `deploy/README.md` for Hostinger, PM2, and
-Nginx deployment instructions.
+Nginx deployment instructions and the AdSense/CMP launch checklist.

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { WriteToolDefinition } from "@/data/writeTools";
+import { trackToolEvent } from "@/lib/clientAnalytics";
 
 export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
   const [input, setInput] = useState("");
@@ -32,9 +33,11 @@ export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
       minutes: Math.max(1, Math.ceil(words / 225)),
     };
   }, [input]);
+  const finishLocal = (value: string) => { setOutput(value); trackToolEvent("tool_success", tool.slug, "write"); };
 
   const run = async () => {
     setError("");
+    trackToolEvent("tool_start", tool.slug, "write");
     if (tool.provider === "openai") {
       if (!input.trim()) { setError("Enter some text or a brief first."); return; }
       setLoading(true);
@@ -46,23 +49,23 @@ export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
         });
         const payload = await response.json() as { output?: string; error?: string };
         if (!response.ok) throw new Error(payload.error || "Unable to generate text.");
-        setOutput(payload.output || "");
+        setOutput(payload.output || ""); trackToolEvent("tool_success", tool.slug, "write");
       } catch (requestError) {
-        setError(requestError instanceof Error ? requestError.message : "Unable to generate text.");
+        const detail = requestError instanceof Error ? requestError.message : "Unable to generate text."; trackToolEvent("tool_error", tool.slug, "write", detail); setError(detail);
       } finally {
         setLoading(false);
       }
       return;
     }
 
-    if (tool.operation === "count") { setOutput(JSON.stringify(stats, null, 2)); return; }
-    if (tool.operation === "case") { setOutput(option === "upper" ? input.toUpperCase() : option === "lower" ? input.toLowerCase() : option === "title" ? input.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase()) : input.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, (letter) => letter.toUpperCase())); return; }
-    if (tool.operation === "deduplicate") { setOutput(Array.from(new Set(input.split(/\r?\n/))).join("\n")); return; }
-    if (tool.operation === "sort") { setOutput(input.split(/\r?\n/).sort((a, b) => option === "desc" ? b.localeCompare(a) : a.localeCompare(b)).join("\n")); return; }
-    if (tool.operation === "find-replace") { setOutput(find ? input.split(find).join(replacement) : input); return; }
-    if (tool.operation === "slug") { setOutput(input.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")); return; }
-    if (tool.operation === "clean") { setOutput(input.replace(/[\t\u00a0]+/g, " ").replace(/ +/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim()); return; }
-    setOutput(option === "words" ? input.split(/(\s+)/).reverse().join("") : option === "lines" ? input.split(/\r?\n/).reverse().join("\n") : Array.from(input).reverse().join(""));
+    if (tool.operation === "count") { finishLocal(JSON.stringify(stats, null, 2)); return; }
+    if (tool.operation === "case") { finishLocal(option === "upper" ? input.toUpperCase() : option === "lower" ? input.toLowerCase() : option === "title" ? input.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase()) : input.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, (letter) => letter.toUpperCase())); return; }
+    if (tool.operation === "deduplicate") { finishLocal(Array.from(new Set(input.split(/\r?\n/))).join("\n")); return; }
+    if (tool.operation === "sort") { finishLocal(input.split(/\r?\n/).sort((a, b) => option === "desc" ? b.localeCompare(a) : a.localeCompare(b)).join("\n")); return; }
+    if (tool.operation === "find-replace") { finishLocal(find ? input.split(find).join(replacement) : input); return; }
+    if (tool.operation === "slug") { finishLocal(input.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")); return; }
+    if (tool.operation === "clean") { finishLocal(input.replace(/[\t\u00a0]+/g, " ").replace(/ +/g, " ").replace(/ *\n */g, "\n").replace(/\n{3,}/g, "\n\n").trim()); return; }
+    finishLocal(option === "words" ? input.split(/(\s+)/).reverse().join("") : option === "lines" ? input.split(/\r?\n/).reverse().join("\n") : Array.from(input).reverse().join(""));
   };
 
   const aiOption = tool.provider === "openai" && (tool.operation === "rewrite" || tool.operation === "grammar" || tool.operation === "tone")
@@ -88,6 +91,6 @@ export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
     </div>
     {tool.provider === "local" && tool.operation === "count" ? <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-[14px] bg-[#e5e0ef] sm:grid-cols-6">{Object.entries(stats).map(([key, value]) => <div className="bg-[#faf9fd] p-4 text-center" key={key}><div className="text-2xl font-black">{value}</div><div className="mt-1 text-xs font-black uppercase text-[#81758f]">{key}</div></div>)}</div> : null}
     {error ? <p className="mt-5 rounded-[12px] bg-[#fff0ed] px-4 py-3 text-sm font-bold text-[#b43720]">{error}</p> : null}
-    <div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#805ad5] px-7 py-3 text-sm font-black text-white disabled:cursor-wait disabled:opacity-60" disabled={loading} onClick={run} type="button">{loading ? "Generating..." : `Run ${tool.name}`}</button>{output ? <button className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" onClick={() => navigator.clipboard.writeText(output)} type="button">Copy output</button> : null}<button className="rounded-full border border-[#dfe7f1] px-7 py-3 text-sm font-black" onClick={() => { setInput(""); setOutput(""); setError(""); }} type="button">Clear</button></div>
+    <div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#805ad5] px-7 py-3 text-sm font-black text-white disabled:cursor-wait disabled:opacity-60" disabled={loading} onClick={run} type="button">{loading ? "Generating..." : `Run ${tool.name}`}</button>{output ? <button className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" onClick={async () => { await navigator.clipboard.writeText(output); trackToolEvent("download_result", tool.slug, "write"); }} type="button">Copy output</button> : null}<button className="rounded-full border border-[#dfe7f1] px-7 py-3 text-sm font-black" onClick={() => { setInput(""); setOutput(""); setError(""); }} type="button">Clear</button></div>
   </div>;
 }

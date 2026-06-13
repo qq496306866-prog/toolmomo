@@ -1,3 +1,5 @@
+import { AdSenseUnit } from "@/components/ads/AdSenseUnit";
 import { EnglishShell } from "@/components/en/EnglishShell";
-import { fileTools } from "@/data/fileTools";
-export default function FileToolsPage() { return <EnglishShell title="File Tools" description="Convert structured data formats privately in your browser."><section className="mx-auto max-w-[1220px] px-5 py-12"><div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{fileTools.map((tool) => <a className="flex min-h-[126px] gap-4 rounded-[18px] border border-[#e3eaf2] bg-white p-5 hover:border-[#9abce7]" href={`/tools/file/${tool.slug}`} key={tool.slug}><span className="grid h-14 w-14 shrink-0 place-items-center rounded-[14px] bg-[#edf4fd] text-xs font-black text-[#285f9f]">{tool.icon}</span><span><span className="text-lg font-black">{tool.name}</span><span className="mt-2 block text-sm font-semibold leading-6 text-[#728197]">{tool.description}</span></span></a>)}</div></section></EnglishShell>; }
+import { ToolCatalog } from "@/components/site/ToolCatalog";
+import { fileCatalog } from "@/lib/catalogTools";
+export default function FileToolsPage() { return <EnglishShell title="File Tools" description="Convert CSV, JSON, XML, Excel, and OpenDocument formats locally or through secure cloud jobs."><section className="mx-auto max-w-[1220px] px-5 pt-10"><AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_CATEGORY_SLOT} /></section><section className="mx-auto max-w-[1220px] px-5 py-10"><ToolCatalog tools={fileCatalog} /></section></EnglishShell>; }

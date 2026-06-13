@@ -29,13 +29,18 @@ PDF limit, five complex jobs per IP per UTC day, and one-hour file retention.
 
 ```text
 npm run build: passed
-Generated pages: 260
+Generated pages: 262
 Tool routes: 243
 PDF: 46
 Image: 74
 Write: 53
 Video: 58
 File: 12
+AdSense: manual responsive slots implemented
+Consent Mode v2: denied defaults implemented
+ads.txt: implemented
+Unverified remote conversions: excluded from sitemap and marked noindex
+Sitemap URLs: 127 verified/indexable pages
 ```
 
 ## Release checklist
@@ -44,3 +49,5 @@ File: 12
 2. Run `bash deploy/update-from-github.sh` on the VPS.
 3. Verify `/api/pdf/providers`, `/tools`, and one local, AI, CloudConvert, and PDF.co tool.
 4. Monitor provider quotas and `.toolmomo-jobs` cleanup after deployment.
+5. Publish the Google-certified CMP messages and configure Auto ads to use
+   Anchor and Side rail only.

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { EnglishMegaHeader } from "@/components/en/EnglishMegaHeader";
+import { ConsentControls } from "@/components/analytics/ConsentControls";
 
 type EnglishShellProps = {
   title?: string;
@@ -51,7 +52,7 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
           </div>
           <div>
             <h3 className="text-sm font-black text-[#263244]">Categories</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools">PDF</a><a href="/tools/image">Image</a><a href="/tools/write">Write</a><a href="/tools/video">Video</a><a href="/tools/file">File</a><a href="/disclaimer">Disclaimer</a></div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools">PDF</a><a href="/tools/image">Image</a><a href="/tools/write">Write</a><a href="/tools/video">Video</a><a href="/tools/file">File</a><a href="/privacy">Privacy</a><a href="/disclaimer">Disclaimer</a><ConsentControls /></div>
           </div>
         </div>
       </footer>

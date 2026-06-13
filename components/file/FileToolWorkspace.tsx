@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FileToolDefinition } from "@/data/fileTools";
 import { createZip } from "@/lib/clientZip";
+import { trackToolEvent } from "@/lib/clientAnalytics";
 
 type Result = { name: string; blob: Blob; url: string };
 const MAX_BYTES = 50 * 1024 * 1024;
@@ -35,7 +36,7 @@ export function FileToolWorkspace({ tool }: { tool: Extract<FileToolDefinition, 
   const publish = (outputs: Array<{ name: string; blob: Blob }>) => { results.forEach((result) => URL.revokeObjectURL(result.url)); setResults(outputs.map((output) => ({ ...output, url: URL.createObjectURL(output.blob) }))); setMessage(`${outputs.length} result${outputs.length === 1 ? "" : "s"} ready.`); };
   const choose = (selected: File | null) => { if (!selected) return; if (selected.size > MAX_BYTES) { setMessage("Files must be 50 MB or less."); return; } setFile(selected); publish([]); setMessage(""); };
   const run = async () => {
-    if (!file) { setMessage("Choose a file first."); return; } setWorking(true); setMessage("Processing in your browser...");
+    if (!file) { setMessage("Choose a file first."); return; } trackToolEvent("tool_start", tool.slug, "file"); setWorking(true); setMessage("Processing in your browser...");
     try {
       const text = await file.text();
       if (tool.operation === "split-csv") { const rows = parseCsv(text); if (rows.length < 2) throw new Error("The CSV must contain a header and at least one data row."); const [header, ...body] = rows; const outputs = []; for (let index = 0; index < body.length; index += rowsPerFile) outputs.push({ name: `csv-part-${outputs.length + 1}.csv`, blob: new Blob([csvString([header, ...body.slice(index, index + rowsPerFile)])], { type: "text/csv;charset=utf-8" }) }); publish(outputs); }
@@ -44,9 +45,10 @@ export function FileToolWorkspace({ tool }: { tool: Extract<FileToolDefinition, 
       if (tool.operation === "json-to-xml") { const data = JSON.parse(text) as unknown; const xml = `<?xml version="1.0" encoding="UTF-8"?>\n${valueToXml("root", data)}`; publish([{ name: "converted.xml", blob: new Blob([xml], { type: "application/xml" }) }]); }
       if (tool.operation === "xml-to-json") { const root = parseXml(text); publish([{ name: "converted.json", blob: new Blob([JSON.stringify({ [root.tagName]: elementToObject(root) }, null, 2)], { type: "application/json" }) }]); }
       if (tool.operation === "xml-to-csv") { const root = parseXml(text); const records = Array.from(root.children); if (!records.length) throw new Error("The XML must contain repeated record elements."); const headers = Array.from(new Set(records.flatMap((record) => Array.from(record.children).map((child) => child.tagName)))); const rows = records.map((record) => headers.map((header) => record.querySelector(`:scope > ${CSS.escape(header)}`)?.textContent || "")); publish([{ name: "converted.csv", blob: new Blob([csvString([headers, ...rows])], { type: "text/csv;charset=utf-8" }) }]); }
-    } catch (error) { setMessage(error instanceof Error ? error.message : "File processing failed."); }
+      trackToolEvent("tool_success", tool.slug, "file");
+    } catch (error) { const detail = error instanceof Error ? error.message : "File processing failed."; trackToolEvent("tool_error", tool.slug, "file", detail); setMessage(detail); }
     finally { setWorking(false); }
   };
-  const downloadZip = async () => { const zip = await createZip(results.map(({ name, blob }) => ({ name, blob }))); const url = URL.createObjectURL(zip); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${tool.slug}.zip`; anchor.click(); URL.revokeObjectURL(url); };
+  const downloadZip = async () => { const zip = await createZip(results.map(({ name, blob }) => ({ name, blob }))); const url = URL.createObjectURL(zip); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${tool.slug}.zip`; anchor.click(); URL.revokeObjectURL(url); trackToolEvent("download_result", tool.slug, "file"); };
   return <div className="rounded-[24px] border border-[#e3eaf2] bg-white p-5 shadow-[0_24px_70px_rgba(32,43,60,0.12)] sm:p-8"><button className="flex min-h-44 w-full flex-col items-center justify-center rounded-[20px] border-2 border-dashed border-[#cfe0f5] bg-[#f5f8fd] px-5" onClick={() => inputRef.current?.click()} type="button"><span className="text-lg font-black">Choose a file</span><span className="mt-2 text-sm font-semibold text-[#728197]">Maximum 50 MB · processed in your browser</span><input accept={tool.accept} className="sr-only" onChange={(event) => choose(event.target.files?.[0] || null)} ref={inputRef} type="file" /></button>{file ? <div className="mt-4 text-sm font-bold text-[#58667a]">{file.name}</div> : null}{tool.operation === "split-csv" ? <label className="mt-5 block text-sm font-black">Rows per file<input className="mt-2 w-full rounded-[12px] border px-4 py-3" min="1" onChange={(event) => setRowsPerFile(Math.max(1, Number(event.target.value)))} type="number" value={rowsPerFile} /></label> : null}{message ? <div className="mt-5 rounded-[14px] bg-[#edf4fd] px-4 py-3 text-sm font-bold text-[#285f9f]">{message}</div> : null}<div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#2674d9] px-7 py-3 text-sm font-black text-white disabled:opacity-50" disabled={working} onClick={run} type="button">{working ? "Processing..." : `Run ${tool.name}`}</button>{results.length > 1 ? <button className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" onClick={downloadZip} type="button">Download ZIP</button> : null}</div>{results.length ? <div className="mt-6 grid gap-3 sm:grid-cols-2">{results.map((result) => <a className="rounded-[12px] border border-[#dfe7f1] px-4 py-3 text-sm font-black" download={result.name} href={result.url} key={result.name}>Download {result.name}</a>)}</div> : null}</div>;
 }

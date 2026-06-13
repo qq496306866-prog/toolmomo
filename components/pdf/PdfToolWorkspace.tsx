@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { PdfToolDefinition } from "@/data/pdfTools";
 import { MAX_FILE_BYTES, MAX_PDF_PAGES } from "@/data/pdfTools";
 import { createZip } from "@/lib/clientZip";
+import { trackToolEvent } from "@/lib/clientAnalytics";
 
 type ResultFile = { name: string; blob: Blob; url: string };
 
@@ -102,7 +103,7 @@ export function PdfToolWorkspace({ tool }: { tool: PdfToolDefinition }) {
   const publish = (outputs: Array<{ name: string; blob: Blob }>) => {
     clearResults();
     setResults(outputs.map((output) => ({ ...output, url: URL.createObjectURL(output.blob) })));
-    setStatus("done"); setMessage(`${outputs.length} result${outputs.length === 1 ? "" : "s"} ready to download.`);
+    setStatus("done"); setMessage(`${outputs.length} result${outputs.length === 1 ? "" : "s"} ready to download.`); trackToolEvent("tool_success", tool.slug, "pdf");
   };
 
   const processLocal = async () => {
@@ -210,20 +211,20 @@ export function PdfToolWorkspace({ tool }: { tool: PdfToolDefinition }) {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       const current = await fetch(`/api/pdf/jobs/${payload.id}`).then((result) => result.json());
       if (current.status === "failed") throw new Error(current.error || "Conversion failed.");
-      if (current.status === "complete") { window.location.href = `/api/pdf/jobs/${payload.id}/download`; return; }
+      if (current.status === "complete") { trackToolEvent("tool_success", tool.slug, "pdf"); trackToolEvent("download_result", tool.slug, "pdf"); window.location.href = `/api/pdf/jobs/${payload.id}/download`; return; }
       setMessage(current.message || "Processing your file...");
     }
     throw new Error("The conversion timed out. Please try again.");
   };
 
   const run = async () => {
-    try { setStatus("working"); setMessage("Processing your files..."); if (tool.provider === "local") await processLocal(); else await processRemote(); }
-    catch (error) { setStatus("error"); setMessage(error instanceof Error ? error.message : "Processing failed."); }
+    try { trackToolEvent("tool_start", tool.slug, "pdf"); setStatus("working"); setMessage("Processing your files..."); if (tool.provider === "local") await processLocal(); else await processRemote(); }
+    catch (error) { const detail = error instanceof Error ? error.message : "Processing failed."; trackToolEvent("tool_error", tool.slug, "pdf", detail); setStatus("error"); setMessage(detail); }
   };
 
   const downloadAll = async () => {
     const zip = await createZip(results.map(({ name, blob }) => ({ name, blob })));
-    const url = URL.createObjectURL(zip); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${tool.slug}.zip`; anchor.click(); URL.revokeObjectURL(url);
+    const url = URL.createObjectURL(zip); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${tool.slug}.zip`; anchor.click(); URL.revokeObjectURL(url); trackToolEvent("download_result", tool.slug, "pdf");
   };
 
   const needsPages = ["split", "delete-pages", "rearrange", "rotate", "crop", "add-page-numbers", "add-watermark", "add-text", "annotate", "edit", "esign"].includes(tool.localOperation || "");

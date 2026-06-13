@@ -29,7 +29,7 @@ function valueToXml(name: string, value: unknown): string { const tag = safeTag(
 function elementToObject(element: Element): unknown { const children = Array.from(element.children); if (!children.length) return element.textContent || ""; const result: Record<string, unknown> = {}; for (const child of children) { const value = elementToObject(child); const current = result[child.tagName]; result[child.tagName] = current === undefined ? value : Array.isArray(current) ? [...current, value] : [current, value]; } return result; }
 function parseXml(text: string) { const document = new DOMParser().parseFromString(text, "application/xml"); const error = document.querySelector("parsererror"); if (error || !document.documentElement) throw new Error("The XML document is not valid."); return document.documentElement; }
 
-export function FileToolWorkspace({ tool }: { tool: FileToolDefinition }) {
+export function FileToolWorkspace({ tool }: { tool: Extract<FileToolDefinition, { provider: "local" }> }) {
   const [file, setFile] = useState<File | null>(null); const [results, setResults] = useState<Result[]>([]); const [rowsPerFile, setRowsPerFile] = useState(1000); const [message, setMessage] = useState(""); const [working, setWorking] = useState(false); const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => () => results.forEach((result) => URL.revokeObjectURL(result.url)), [results]);
   const publish = (outputs: Array<{ name: string; blob: Blob }>) => { results.forEach((result) => URL.revokeObjectURL(result.url)); setResults(outputs.map((output) => ({ ...output, url: URL.createObjectURL(output.blob) }))); setMessage(`${outputs.length} result${outputs.length === 1 ? "" : "s"} ready.`); };

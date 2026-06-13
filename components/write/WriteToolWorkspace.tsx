@@ -6,11 +6,20 @@ import type { WriteToolDefinition } from "@/data/writeTools";
 export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
-  const [option, setOption] = useState(tool.provider === "openai" && tool.operation === "translate" ? "Spanish" : "upper");
+  const [option, setOption] = useState(() => {
+    if (tool.provider === "openai") {
+      if (tool.operation === "translate") return "Spanish";
+      if (tool.operation === "rewrite" || tool.operation === "grammar") return "Natural and clear";
+      return "";
+    }
+    return "upper";
+  });
   const [find, setFind] = useState("");
   const [replacement, setReplacement] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const textTransformationOperations = ["rewrite", "grammar", "summarize", "translate", "shorten", "paraphrase", "tone", "active-passive", "bullets", "conclusion", "expand"];
+  const isBriefTool = tool.provider === "openai" && !textTransformationOperations.includes(tool.operation);
 
   const stats = useMemo(() => {
     const words = input.trim() ? input.trim().split(/\s+/).length : 0;
@@ -56,18 +65,18 @@ export function WriteToolWorkspace({ tool }: { tool: WriteToolDefinition }) {
     setOutput(option === "words" ? input.split(/(\s+)/).reverse().join("") : option === "lines" ? input.split(/\r?\n/).reverse().join("\n") : Array.from(input).reverse().join(""));
   };
 
-  const aiOption = tool.provider === "openai" && (tool.operation === "rewrite" || tool.operation === "grammar")
+  const aiOption = tool.provider === "openai" && (tool.operation === "rewrite" || tool.operation === "grammar" || tool.operation === "tone")
     ? <select className="rounded-[12px] border px-4 py-3 font-bold" onChange={(event) => setOption(event.target.value)} value={option}><option value="Natural and clear">Natural and clear</option><option value="Professional">Professional</option><option value="Friendly">Friendly</option><option value="Concise">Concise</option><option value="Formal">Formal</option></select>
     : tool.provider === "openai" && tool.operation === "translate"
       ? <input className="rounded-[12px] border px-4 py-3" onChange={(event) => setOption(event.target.value)} placeholder="Target language, e.g. Spanish" value={option} />
-      : tool.provider === "openai" && (tool.operation === "article" || tool.operation === "email" || tool.operation === "social")
-        ? <input className="rounded-[12px] border px-4 py-3" onChange={(event) => setOption(event.target.value)} placeholder="Optional tone or audience" value={option === "upper" ? "" : option} />
+    : isBriefTool
+        ? <input className="rounded-[12px] border px-4 py-3" onChange={(event) => setOption(event.target.value)} placeholder="Optional tone or audience" value={option} />
         : null;
 
   return <div className="rounded-[20px] border border-[#e3eaf2] bg-white p-5 shadow-[0_24px_70px_rgba(32,43,60,0.1)] sm:p-8">
-    {tool.provider === "openai" ? <div className="mb-5 flex items-center justify-between gap-4 rounded-[14px] bg-[#f7f3ff] px-4 py-3 text-sm font-bold text-[#6842b5]"><span>Powered by OpenAI. Requests are processed securely and are not saved by TOOLMOMO.</span><span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs">5/day</span></div> : null}
+    {tool.provider === "openai" ? <div className="mb-5 flex items-center justify-between gap-4 rounded-[14px] bg-[#f7f3ff] px-4 py-3 text-sm font-bold text-[#6842b5]"><span>Powered by TOOLMOMO AI. Requests are processed securely and are not saved by TOOLMOMO.</span><span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs">5/day</span></div> : null}
     <div className="grid gap-5 lg:grid-cols-2">
-      <label className="text-sm font-black">{tool.provider === "openai" && ["article", "email", "titles", "social"].includes(tool.operation) ? "Topic or brief" : "Input"}<textarea className="mt-2 min-h-[320px] w-full resize-y rounded-[14px] border border-[#dfe7f1] p-4 font-medium leading-7 outline-none focus:border-[#805ad5]" maxLength={tool.provider === "openai" ? 20000 : undefined} onChange={(event) => setInput(event.target.value)} placeholder={tool.provider === "openai" ? "Describe what you need or paste your text" : "Enter or paste text"} value={input} /></label>
+      <label className="text-sm font-black">{isBriefTool ? "Topic or brief" : "Input"}<textarea className="mt-2 min-h-[320px] w-full resize-y rounded-[14px] border border-[#dfe7f1] p-4 font-medium leading-7 outline-none focus:border-[#805ad5]" maxLength={tool.provider === "openai" ? 20000 : undefined} onChange={(event) => setInput(event.target.value)} placeholder={isBriefTool ? "Describe the content you want generated" : tool.provider === "openai" ? "Paste the text you want this tool to process" : "Enter or paste text"} value={input} /></label>
       <label className="text-sm font-black">Output<textarea className="mt-2 min-h-[320px] w-full resize-y rounded-[14px] border border-[#dfe7f1] bg-[#faf9fd] p-4 font-medium leading-7" readOnly value={output} /></label>
     </div>
     <div className="mt-5 grid gap-4 sm:grid-cols-3">

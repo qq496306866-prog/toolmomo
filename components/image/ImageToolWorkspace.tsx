@@ -13,12 +13,14 @@ async function loadImage(file: File) {
   return { bitmap, width: bitmap.width, height: bitmap.height };
 }
 
-function canvasBlob(canvas: HTMLCanvasElement, format: ImageToolDefinition["outputFormat"], quality: number) {
+type LocalImageTool = Extract<ImageToolDefinition, { provider: "local" }>;
+
+function canvasBlob(canvas: HTMLCanvasElement, format: LocalImageTool["outputFormat"], quality: number) {
   const mime = format === "jpg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
   return new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("The browser could not encode this image.")), mime, quality));
 }
 
-export function ImageToolWorkspace({ tool }: { tool: ImageToolDefinition }) {
+export function ImageToolWorkspace({ tool }: { tool: LocalImageTool }) {
   const [files, setFiles] = useState<File[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
   const [message, setMessage] = useState("");
@@ -80,6 +82,12 @@ export function ImageToolWorkspace({ tool }: { tool: ImageToolDefinition }) {
         loaded.forEach((image) => { context?.drawImage(image.bitmap, direction === "horizontal" ? offset : 0, direction === "vertical" ? offset : 0); offset += direction === "horizontal" ? image.width : image.height; });
       } else if (tool.operation === "resize") {
         canvas.width = Math.max(1, width); canvas.height = Math.max(1, height); if (canvas.width > MAX_CANVAS_EDGE || canvas.height > MAX_CANVAS_EDGE || canvas.width * canvas.height > MAX_PIXELS) throw new Error("The requested dimensions are too large for safe browser processing."); context.drawImage(first.bitmap, 0, 0, canvas.width, canvas.height);
+      } else if (tool.operation === "preset-resize") {
+        canvas.width = tool.presetWidth || 512; canvas.height = tool.presetHeight || 512;
+        const scale = Math.max(canvas.width / first.width, canvas.height / first.height);
+        const drawWidth = first.width * scale; const drawHeight = first.height * scale;
+        if (tool.outputFormat === "jpg") { context.fillStyle = "#ffffff"; context.fillRect(0, 0, canvas.width, canvas.height); }
+        context.drawImage(first.bitmap, (canvas.width - drawWidth) / 2, (canvas.height - drawHeight) / 2, drawWidth, drawHeight);
       } else if (tool.operation === "crop") {
         const margin = Math.max(0, Math.min(amount, Math.floor(Math.min(first.width, first.height) / 2) - 1));
         canvas.width = first.width - margin * 2; canvas.height = first.height - margin * 2; context.drawImage(first.bitmap, margin, margin, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
@@ -89,15 +97,51 @@ export function ImageToolWorkspace({ tool }: { tool: ImageToolDefinition }) {
         canvas.width = first.width + amount * 2; canvas.height = first.height + amount * 2; context.fillStyle = color; context.fillRect(0, 0, canvas.width, canvas.height); context.drawImage(first.bitmap, amount, amount);
       } else if (tool.operation === "flip") {
         canvas.width = first.width; canvas.height = first.height; context.translate(direction === "horizontal" ? canvas.width : 0, direction === "vertical" ? canvas.height : 0); context.scale(direction === "horizontal" ? -1 : 1, direction === "vertical" ? -1 : 1); context.drawImage(first.bitmap, 0, 0);
+      } else if (tool.operation === "rotate") {
+        canvas.width = first.height; canvas.height = first.width; context.translate(canvas.width / 2, canvas.height / 2); context.rotate((tool.angle || 90) * Math.PI / 180); context.drawImage(first.bitmap, -first.width / 2, -first.height / 2);
+      } else if (tool.operation === "square") {
+        const size = Math.min(first.width, first.height); canvas.width = size; canvas.height = size; context.drawImage(first.bitmap, (first.width - size) / 2, (first.height - size) / 2, size, size, 0, 0, size, size);
       } else if (tool.operation === "pixelate") {
         const scale = Math.max(2, amount); const small = document.createElement("canvas"); small.width = Math.max(1, Math.floor(first.width / scale)); small.height = Math.max(1, Math.floor(first.height / scale)); small.getContext("2d")?.drawImage(first.bitmap, 0, 0, small.width, small.height); canvas.width = first.width; canvas.height = first.height; context.imageSmoothingEnabled = false; context.drawImage(small, 0, 0, canvas.width, canvas.height);
       } else {
         canvas.width = first.width; canvas.height = first.height;
         if (tool.outputFormat === "jpg") { context.fillStyle = "#ffffff"; context.fillRect(0, 0, canvas.width, canvas.height); }
         if (tool.operation === "grayscale") context.filter = "grayscale(1)";
+        if (tool.operation === "filter") {
+          const strength = Math.max(1, amount);
+          context.filter = tool.effect === "sepia" ? `sepia(${Math.min(100, strength)}%)`
+            : tool.effect === "invert" ? `invert(${Math.min(100, strength)}%)`
+              : tool.effect === "blur" ? `blur(${Math.min(30, strength / 3)}px)`
+                : tool.effect === "brightness" ? `brightness(${50 + strength * 1.5}%)`
+                  : tool.effect === "contrast" || tool.effect === "sharpen" ? `contrast(${75 + strength * 1.75}%)`
+                    : `saturate(${strength * 2}%)`;
+        }
         context.drawImage(first.bitmap, 0, 0);
         context.filter = "none";
         if (tool.operation === "text") { context.font = `900 ${Math.max(16, amount * 2)}px Arial`; context.fillStyle = color; context.textBaseline = "bottom"; context.fillText(text, 30, canvas.height - 30); }
+        if (tool.operation === "meme") {
+          const [top = "TOP TEXT", bottom = "BOTTOM TEXT"] = text.split("|");
+          const fontSize = Math.max(28, Math.floor(canvas.width / 11)); context.font = `900 ${fontSize}px Arial`; context.textAlign = "center"; context.lineWidth = Math.max(3, fontSize / 15); context.strokeStyle = "#000000"; context.fillStyle = "#ffffff";
+          context.textBaseline = "top"; context.strokeText(top.trim(), canvas.width / 2, 20); context.fillText(top.trim(), canvas.width / 2, 20);
+          context.textBaseline = "bottom"; context.strokeText(bottom.trim(), canvas.width / 2, canvas.height - 20); context.fillText(bottom.trim(), canvas.width / 2, canvas.height - 20);
+        }
+        if (tool.operation === "watermark") {
+          context.save(); context.globalAlpha = Math.max(0.08, Math.min(0.65, amount / 100)); context.fillStyle = color; context.font = `700 ${Math.max(18, Math.floor(canvas.width / 16))}px Arial`; context.rotate(-Math.PI / 6);
+          for (let y = -canvas.height; y < canvas.height * 2; y += 140) for (let x = -canvas.width; x < canvas.width * 2; x += 260) context.fillText(text, x, y);
+          context.restore();
+        }
+        if (tool.operation === "transparent") {
+          const target = color.match(/[a-f0-9]{2}/gi)?.map((part) => parseInt(part, 16)) || [255, 255, 255]; const pixels = context.getImageData(0, 0, canvas.width, canvas.height); const tolerance = amount;
+          for (let index = 0; index < pixels.data.length; index += 4) if (Math.abs(pixels.data[index] - target[0]) <= tolerance && Math.abs(pixels.data[index + 1] - target[1]) <= tolerance && Math.abs(pixels.data[index + 2] - target[2]) <= tolerance) pixels.data[index + 3] = 0;
+          context.putImageData(pixels, 0, 0);
+        }
+      }
+
+      if (tool.operation === "colors") {
+        const sample = document.createElement("canvas"); sample.width = 64; sample.height = 64; const sampleContext = sample.getContext("2d"); if (!sampleContext) throw new Error("Canvas is not available."); sampleContext.drawImage(first.bitmap, 0, 0, 64, 64);
+        const pixels = sampleContext.getImageData(0, 0, 64, 64).data; const buckets = new Map<string, number>();
+        for (let index = 0; index < pixels.length; index += 16) { const key = [pixels[index], pixels[index + 1], pixels[index + 2]].map((value) => Math.round(value / 32) * 32).map((value) => Math.min(255, value).toString(16).padStart(2, "0")).join(""); buckets.set(`#${key}`, (buckets.get(`#${key}`) || 0) + 1); }
+        const palette = [...buckets.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10).map(([hex]) => hex); const blob = new Blob([JSON.stringify({ palette }, null, 2)], { type: "application/json" }); loaded.forEach((image) => image.bitmap.close()); setOutput({ blob, url: URL.createObjectURL(blob), name: "image-color-palette.json" }); setMessage("Your color palette is ready."); return;
       }
 
       const blob = await canvasBlob(canvas, tool.outputFormat, quality / 100);
@@ -113,10 +157,10 @@ export function ImageToolWorkspace({ tool }: { tool: ImageToolDefinition }) {
     {files.length ? <div className="mt-4 text-sm font-bold text-[#58667a]">{files.map((file) => file.name).join(", ")}</div> : null}
     <div className="mt-5 grid gap-4 sm:grid-cols-2">
       {tool.operation === "resize" ? <><label className="text-sm font-black">Width<input className="mt-2 w-full rounded-[12px] border px-4 py-3" min="1" onChange={(event) => setWidth(Number(event.target.value))} type="number" value={width} /></label><label className="text-sm font-black">Height<input className="mt-2 w-full rounded-[12px] border px-4 py-3" min="1" onChange={(event) => setHeight(Number(event.target.value))} type="number" value={height} /></label></> : null}
-      {["compress", "crop", "pixelate", "border", "text"].includes(tool.operation) ? <label className="text-sm font-black">{tool.operation === "compress" ? `Quality: ${quality}%` : tool.operation === "text" ? "Text size" : "Amount"}<input className="mt-3 w-full accent-[#16a6a1]" max={tool.operation === "compress" ? 100 : 100} min={tool.operation === "compress" ? 10 : 2} onChange={(event) => tool.operation === "compress" ? setQuality(Number(event.target.value)) : setAmount(Number(event.target.value))} type="range" value={tool.operation === "compress" ? quality : amount} /></label> : null}
+      {["compress", "crop", "pixelate", "border", "text", "filter", "watermark", "transparent"].includes(tool.operation) ? <label className="text-sm font-black">{tool.operation === "compress" ? `Quality: ${quality}%` : tool.operation === "text" ? "Text size" : tool.operation === "transparent" ? "Color tolerance" : tool.operation === "watermark" ? "Opacity" : "Amount"}<input className="mt-3 w-full accent-[#16a6a1]" max="100" min={tool.operation === "compress" ? 10 : 2} onChange={(event) => tool.operation === "compress" ? setQuality(Number(event.target.value)) : setAmount(Number(event.target.value))} type="range" value={tool.operation === "compress" ? quality : amount} /></label> : null}
       {["flip", "combine"].includes(tool.operation) ? <label className="text-sm font-black">Direction<select className="mt-2 w-full rounded-[12px] border px-4 py-3" onChange={(event) => setDirection(event.target.value as "horizontal" | "vertical")} value={direction}><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></label> : null}
-      {tool.operation === "text" ? <label className="text-sm font-black">Text<input className="mt-2 w-full rounded-[12px] border px-4 py-3" onChange={(event) => setText(event.target.value)} value={text} /></label> : null}
-      {["border", "text"].includes(tool.operation) ? <label className="text-sm font-black">Color<input className="mt-2 block h-12 w-full rounded-[12px] border p-1" onChange={(event) => setColor(event.target.value)} type="color" value={color} /></label> : null}
+      {["text", "meme", "watermark"].includes(tool.operation) ? <label className="text-sm font-black">{tool.operation === "meme" ? "Top text | Bottom text" : tool.operation === "watermark" ? "Watermark text" : "Text"}<input className="mt-2 w-full rounded-[12px] border px-4 py-3" onChange={(event) => setText(event.target.value)} value={text} /></label> : null}
+      {["border", "text", "watermark", "transparent"].includes(tool.operation) ? <label className="text-sm font-black">{tool.operation === "transparent" ? "Color to remove" : "Color"}<input className="mt-2 block h-12 w-full rounded-[12px] border p-1" onChange={(event) => setColor(event.target.value)} type="color" value={color} /></label> : null}
     </div>
     {message ? <div className="mt-5 rounded-[14px] bg-[#eef9f7] px-4 py-3 text-sm font-bold text-[#15766f]">{message}</div> : null}
     <div className="mt-5 flex flex-wrap gap-3"><button className="rounded-full bg-[#14948f] px-7 py-3 text-sm font-black text-white disabled:opacity-50" disabled={working} onClick={run} type="button">{working ? "Processing..." : `Run ${tool.name}`}</button>{output ? <a className="rounded-full bg-[#263244] px-7 py-3 text-sm font-black text-white" download={output.name} href={output.url}>Download result</a> : null}</div>

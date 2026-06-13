@@ -1,18 +1,6 @@
 import { navItems } from "@/data/tools";
 import { LogoMark } from "./LogoMark";
 
-function getNavHref(item: string) {
-  if (item === navItems[0]) {
-    return "/";
-  }
-
-  if (item === navItems[navItems.length - 1]) {
-    return "/tools";
-  }
-
-  return `/category/${encodeURIComponent(item)}`;
-}
-
 export function Header() {
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
@@ -24,10 +12,10 @@ export function Header() {
           {navItems.map((item) => (
             <a
               className="rounded-md px-3 py-2 hover:bg-primary-50 hover:text-primary-700"
-              href={getNavHref(item)}
-              key={item}
+              href={item.href}
+              key={`${item.label}-${item.href}`}
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </nav>
@@ -42,10 +30,10 @@ export function Header() {
         {navItems.map((item) => (
           <a
             className="min-w-fit rounded-md bg-slate-100 px-3 py-2 hover:bg-accent-50 hover:text-accent-700"
-            href={getNavHref(item)}
-            key={item}
+            href={item.href}
+            key={`${item.label}-${item.href}`}
           >
-            {item}
+            {item.label}
           </a>
         ))}
       </nav>

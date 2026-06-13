@@ -21,9 +21,9 @@ const relatedTools = [
     description: "实时查看 Markdown 排版效果。",
   },
   {
-    name: "小红书标题生成",
-    href: "/tools/xhs-title",
-    description: "按场景生成更适合种草内容的标题。",
+    name: "社交媒体标题生成器",
+    href: "/tools/social-media-title-generator",
+    description: "按场景生成更适合社交媒体内容的标题。",
   },
 ];
 
@@ -51,7 +51,7 @@ export default function WordCountPage() {
         <WordCountTool />
         <InfoPanel
           items={[
-            "适合公众号、小红书、短视频脚本、商品文案和论文摘要等内容整理。",
+            "适合博客、社交媒体、短视频脚本、商品文案和论文摘要等内容整理。",
             "输入内容只在浏览器本地统计，不会提交到服务器。",
             "复制长文本后直接粘贴即可实时查看结果。",
           ]}

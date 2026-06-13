@@ -21,9 +21,9 @@ const relatedTools = [
     description: "将常见图片格式转换为轻量 WebP。",
   },
   {
-    name: "淘宝主图尺寸",
-    href: "/tools/taobao-main-image",
-    description: "查询并裁剪淘宝、天猫常用主图尺寸。",
+    name: "电商图片尺寸工具",
+    href: "/tools/ecommerce-image-size-tool",
+    description: "查询并裁剪全球通用电商和社交媒体图片尺寸。",
   },
 ];
 

@@ -8,7 +8,7 @@ import type { ShortVideoTemplateProps } from "@/remotion/ShortVideoTemplate";
 type TemplateStyle = "sales" | "knowledge" | "list";
 
 const templateStyles: Record<TemplateStyle, string> = {
-  sales: "带货种草",
+  sales: "产品介绍",
   knowledge: "知识口播",
   list: "清单盘点",
 };

@@ -1,4 +1,4 @@
-import { categoryTabs, toolsByCategory } from "@/data/tools";
+import { categoryTabs, getCategoryHref, toolsByCategory } from "@/data/tools";
 import { SectionHeader } from "./SectionHeader";
 
 const matrixCategories = categoryTabs;
@@ -16,7 +16,7 @@ export function ToolMatrix() {
             <div className="rounded-md border border-slate-200 bg-slate-50 p-4" key={category}>
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-bold text-slate-950">{category}</h3>
-                <a className="text-xs font-semibold text-accent-600" href={`/category/${encodeURIComponent(category)}`}>
+                <a className="text-xs font-semibold text-accent-600" href={getCategoryHref(category)}>
                   更多
                 </a>
               </div>

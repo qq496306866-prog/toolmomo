@@ -3,7 +3,7 @@ import { Footer } from "@/components/home/Footer";
 import { Header } from "@/components/home/Header";
 import { ToolCard } from "@/components/home/ToolCard";
 import { TopBar } from "@/components/home/TopBar";
-import { categoryTabs, tools } from "@/data/tools";
+import { categorySlugs, categoryTabs, getCategoryBySlug, getCategoryHref, tools } from "@/data/tools";
 import { notFound } from "next/navigation";
 
 type CategoryPageProps = {
@@ -20,19 +20,24 @@ function decodeParam(value: string) {
   }
 }
 
+function resolveCategory(value: string) {
+  const decoded = decodeParam(value);
+  return getCategoryBySlug(decoded) ?? decoded;
+}
+
 function getCategoryTools(category: string) {
   return tools.filter((tool) => tool.category === category);
 }
 
 export function generateStaticParams() {
   return categoryTabs.map((category) => ({
-    name: encodeURIComponent(category),
+    name: categorySlugs[category],
   }));
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { name } = await params;
-  const category = decodeParam(name);
+  const category = resolveCategory(name);
 
   if (!categoryTabs.includes(category as (typeof categoryTabs)[number])) {
     return {
@@ -49,7 +54,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { name } = await params;
-  const category = decodeParam(name);
+  const category = resolveCategory(name);
 
   if (!categoryTabs.includes(category as (typeof categoryTabs)[number])) {
     notFound();
@@ -103,11 +108,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           {categoryTabs.map((item) => (
             <a
               className={
-                item === category
+              item === category
                   ? "rounded-md bg-primary-700 px-3 py-2 text-sm font-semibold text-white"
                   : "rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:text-accent-700"
               }
-              href={`/category/${encodeURIComponent(item)}`}
+              href={getCategoryHref(item)}
               key={item}
             >
               {item}

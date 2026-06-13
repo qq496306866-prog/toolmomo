@@ -16,9 +16,9 @@ const relatedTools = [
     description: "整理商品卖点，生成更清晰的标题结构。",
   },
   {
-    name: "淘宝主图尺寸",
-    href: "/tools/taobao-main-image",
-    description: "查询并生成淘宝、天猫常用主图尺寸。",
+    name: "电商图片尺寸工具",
+    href: "/tools/ecommerce-image-size-tool",
+    description: "查询并生成全球通用电商和社交媒体图片尺寸。",
   },
   {
     name: "文本去重",

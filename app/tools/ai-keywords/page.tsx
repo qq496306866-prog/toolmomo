@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 
 const relatedTools = [
   {
-    name: "AI文案生成",
-    href: "/tools/ai-copywriting",
-    description: "快速生成营销文案、标题和短内容草稿。",
-  },
-  {
     name: "AI标题助手",
     href: "/tools/ai-title",
-    description: "生成小红书、短视频和电商标题灵感。",
+    description: "生成社交媒体、短视频和电商标题灵感。",
+  },
+  {
+    name: "商品标题优化",
+    href: "/tools/product-title",
+    description: "整理商品卖点，生成更清晰的标题结构。",
   },
   {
     name: "文本去重",
@@ -51,7 +51,7 @@ export default function AiKeywordsPage() {
         <AiKeywordsTool />
         <InfoPanel
           items={[
-            "适合电商标题、SEO 页面、短视频标签、小红书选题和广告关键词整理。",
+            "适合电商标题、SEO 页面、短视频标签、社交媒体选题和广告关键词整理。",
             "建议输入明确核心词，再补充人群和场景词。",
             "后续接入真实 AI 后，可以扩展为语义聚类和搜索意图分析。",
           ]}

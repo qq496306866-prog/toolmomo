@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { siteCopy } from "@/data/tools";
 import "./globals.css";
 
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -8,12 +9,12 @@ const gaId = process.env.NEXT_PUBLIC_GA_ID;
 export const metadata: Metadata = {
   metadataBase: new URL("https://toolmomo.com"),
   title: {
-    default: "Toolmomo 免费中文在线工具箱",
+    default: siteCopy.title,
     template: "%s | Toolmomo",
   },
   description:
-    "提供图片处理、文本整理、电商运营、短视频创作、开发者常用工具，打开即用，无需安装。",
-  keywords: ["Toolmomo", "在线工具", "中文工具箱", "图片工具", "文本工具", "开发工具", "电商工具"],
+    "TOOLMOMO 提供AI写作、AI提示词、图片处理、PDF处理、SEO、电商、社交媒体和开发者常用工具，帮助创作者、站长和小企业提升效率。",
+  keywords: ["Toolmomo", "在线工具", "AI工具测评", "AI工具推荐", "图片工具", "PDF工具", "SEO工具", "开发工具"],
   verification: {
     google: "p00mldr9Ddv6rm-jWcObCeKimRwjujIfKQuSD7FP5ZA",
     other: {
@@ -34,9 +35,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   openGraph: {
-    title: "Toolmomo 免费中文在线工具箱",
+    title: siteCopy.title,
     description:
-      "提供图片处理、文本整理、电商运营、短视频创作、开发者常用工具，打开即用，无需安装。",
+      "TOOLMOMO 提供AI写作、AI提示词、图片处理、PDF处理、SEO、电商、社交媒体和开发者常用工具，帮助创作者、站长和小企业提升效率。",
     url: "https://toolmomo.com",
     siteName: "Toolmomo",
     locale: "zh_CN",

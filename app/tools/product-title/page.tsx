@@ -6,14 +6,14 @@ import { ToolPageShell } from "@/components/tools/ToolPageShell";
 
 export const metadata: Metadata = {
   title: "商品标题优化 - Toolmomo 免费中文在线工具箱",
-  description: "根据商品名称、卖点、人群和场景生成电商标题候选，适合淘宝、京东、拼多多和小红书。",
+  description: "根据商品名称、卖点、人群和场景生成电商标题候选，适合跨境电商、品牌官网、折扣渠道和社交媒体。",
 };
 
 const relatedTools = [
   {
-    name: "淘宝主图尺寸",
-    href: "/tools/taobao-main-image",
-    description: "查询并生成淘宝、天猫常用主图尺寸。",
+    name: "电商图片尺寸工具",
+    href: "/tools/ecommerce-image-size-tool",
+    description: "查询并生成全球通用电商和社交媒体图片尺寸。",
   },
   {
     name: "图片压缩",
@@ -52,7 +52,7 @@ export default function ProductTitlePage() {
         <InfoPanel
           items={[
             "适合商品上架前整理卖点、场景词和人群词。",
-            "可用于淘宝、天猫、京东、拼多多和小红书基础标题草稿。",
+            "可用于跨境电商、品牌官网、折扣渠道和社交媒体基础标题草稿。",
             "后续接入 AI 后，可以在此基础上生成更自然的标题版本。",
           ]}
           title="使用说明"

@@ -1,0 +1,15 @@
+.git
+.next
+.npm-cache
+node_modules
+toolmomo/node_modules
+toolmomo/.next
+.agents
+.codex
+*.log
+*.zip
+Dockerfile
+docker-compose.yml
+README.md
+SEO_CHECKLIST.md
+UPLOAD_CHECKLIST.md

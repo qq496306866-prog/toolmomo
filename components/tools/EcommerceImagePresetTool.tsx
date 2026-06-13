@@ -2,15 +2,15 @@
 
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 
-type EcommerceImagePresetLocale = "zh" | "en";
+type Locale = "zh" | "en";
 
 type Preset = {
   id: string;
-  name: Record<EcommerceImagePresetLocale, string>;
-  platform: Record<EcommerceImagePresetLocale, string>;
+  name: Record<Locale, string>;
+  platform: string;
   width: number;
   height: number;
-  note: Record<EcommerceImagePresetLocale, string>;
+  note: Record<Locale, string>;
 };
 
 type OutputImage = {
@@ -26,32 +26,32 @@ const copy = {
     currentPreset: "当前规格",
     sourceSize: "原图尺寸",
     outputSize: "输出大小",
-    chooseImage: "选择商品图片",
-    chooseHint: "选择后会显示原图预览，可按平台规格生成居中裁剪主图。",
-    imagePreviewAlt: "商品图预览",
-    presetTitle: "平台规格",
+    chooseImage: "选择产品图片",
+    chooseHint: "选择后会显示原图预览，可按全球通用电商和社交媒体规格生成居中裁剪图片。",
+    imagePreviewAlt: "产品图片预览",
+    presetTitle: "通用规格",
     quality: "输出质量",
-    generate: "生成主图",
+    generate: "生成图片",
     generating: "生成中...",
     clear: "清空",
     result: "生成结果",
     outputLabel: "输出大小",
-    download: "下载主图",
-    resultAlt: "主图生成结果",
+    download: "下载图片",
+    resultAlt: "图片生成结果",
     fileTypeError: "请选择 JPG、PNG、WebP 等图片文件。",
-    missingFileError: "请先选择一张商品图片。",
+    missingFileError: "请先选择一张产品图片。",
     loadError: "图片读取失败，请换一张图片重试。",
     canvasError: "浏览器不支持 Canvas 图片处理。",
-    generateError: "主图生成失败，请重试。",
+    generateError: "图片生成失败，请重试。",
   },
   en: {
     currentPreset: "Current preset",
     sourceSize: "Source size",
     outputSize: "Output size",
     chooseImage: "Choose product image",
-    chooseHint: "Preview the source image, then generate a centered crop for the selected marketplace size.",
+    chooseHint: "Preview the source image, then generate a centered crop for global ecommerce and social media sizes.",
     imagePreviewAlt: "Product image preview",
-    presetTitle: "Marketplace presets",
+    presetTitle: "Global presets",
     quality: "Output quality",
     generate: "Generate image",
     generating: "Generating...",
@@ -59,7 +59,7 @@ const copy = {
     result: "Generated result",
     outputLabel: "Output size",
     download: "Download image",
-    resultAlt: "Generated product image",
+    resultAlt: "Generated image",
     fileTypeError: "Choose an image file such as JPG, PNG, or WebP.",
     missingFileError: "Choose a product image first.",
     loadError: "The image could not be loaded. Try another file.",
@@ -72,7 +72,7 @@ const presets: Preset[] = [
   {
     id: "amazon-main",
     name: { zh: "Amazon 主图", en: "Amazon Main Image" },
-    platform: { zh: "Amazon", en: "Amazon" },
+    platform: "Amazon",
     width: 2000,
     height: 2000,
     note: {
@@ -83,7 +83,7 @@ const presets: Preset[] = [
   {
     id: "shopify-square",
     name: { zh: "Shopify 商品方图", en: "Shopify Product Square" },
-    platform: { zh: "Shopify", en: "Shopify" },
+    platform: "Shopify",
     width: 2048,
     height: 2048,
     note: {
@@ -94,18 +94,18 @@ const presets: Preset[] = [
   {
     id: "etsy-listing",
     name: { zh: "Etsy 列表图", en: "Etsy Listing Image" },
-    platform: { zh: "Etsy", en: "Etsy" },
+    platform: "Etsy",
     width: 2000,
     height: 1600,
     note: {
-      zh: "适合 Etsy 搜索结果和商品图库预览的横向比例。",
+      zh: "适合 Etsy 搜索结果和商品图册预览的横向比例。",
       en: "Landscape listing image ratio commonly used for Etsy search and product gallery previews.",
     },
   },
   {
     id: "ebay-gallery",
     name: { zh: "eBay 图库图", en: "eBay Gallery Image" },
-    platform: { zh: "eBay", en: "eBay" },
+    platform: "eBay",
     width: 1600,
     height: 1600,
     note: {
@@ -116,7 +116,7 @@ const presets: Preset[] = [
   {
     id: "walmart-main",
     name: { zh: "Walmart 主图", en: "Walmart Main Image" },
-    platform: { zh: "Walmart", en: "Walmart" },
+    platform: "Walmart",
     width: 2000,
     height: 2000,
     note: {
@@ -125,80 +125,25 @@ const presets: Preset[] = [
     },
   },
   {
-    id: "taobao-main",
-    name: { zh: "淘宝主图", en: "Taobao Main Image" },
-    platform: { zh: "淘宝", en: "Taobao" },
-    width: 800,
-    height: 800,
+    id: "instagram-square",
+    name: { zh: "Instagram 方图", en: "Instagram Square Post" },
+    platform: "Instagram",
+    width: 1080,
+    height: 1080,
     note: {
-      zh: "常用商品主图比例，适合列表和商品详情入口。",
-      en: "Standard square product image for Taobao listing and product detail entry points.",
+      zh: "适合品牌社交媒体产品展示、促销海报和内容封面。",
+      en: "Square image for brand social posts, product promos, and content covers.",
     },
   },
   {
-    id: "taobao-long-main",
-    name: { zh: "淘宝竖版长图", en: "Taobao Portrait Image" },
-    platform: { zh: "淘宝", en: "Taobao" },
-    width: 750,
-    height: 1000,
+    id: "pinterest-pin",
+    name: { zh: "Pinterest 长图", en: "Pinterest Pin" },
+    platform: "Pinterest",
+    width: 1000,
+    height: 1500,
     note: {
-      zh: "常用于竖版主图、场景图和商品长图展示。",
-      en: "Portrait product image for scene images and taller product gallery assets.",
-    },
-  },
-  {
-    id: "tmall-main",
-    name: { zh: "天猫主图", en: "Tmall Main Image" },
-    platform: { zh: "天猫", en: "Tmall" },
-    width: 800,
-    height: 800,
-    note: {
-      zh: "常见天猫商品主图规格，建议主体居中留白。",
-      en: "Common Tmall square product image size with centered product framing.",
-    },
-  },
-  {
-    id: "jd-main",
-    name: { zh: "京东主图", en: "JD Product Image" },
-    platform: { zh: "京东", en: "JD" },
-    width: 800,
-    height: 800,
-    note: {
-      zh: "京东商品主图常用方图规格。",
-      en: "Common square product image size for JD listings.",
-    },
-  },
-  {
-    id: "pdd-main",
-    name: { zh: "拼多多主图", en: "Pinduoduo Main Image" },
-    platform: { zh: "拼多多", en: "Pinduoduo" },
-    width: 800,
-    height: 800,
-    note: {
-      zh: "适合商品主图和活动入口图基础处理。",
-      en: "Square product image size for Pinduoduo product and promotion entry images.",
-    },
-  },
-  {
-    id: "douyin-main",
-    name: { zh: "抖店商品图", en: "Douyin Shop Image" },
-    platform: { zh: "抖店", en: "Douyin Shop" },
-    width: 800,
-    height: 800,
-    note: {
-      zh: "抖店常用商品图尺寸，适合正方形素材。",
-      en: "Square product image size commonly used for Douyin Shop assets.",
-    },
-  },
-  {
-    id: "taobao-detail",
-    name: { zh: "淘宝详情页宽图", en: "Taobao Detail Image" },
-    platform: { zh: "淘宝", en: "Taobao" },
-    width: 790,
-    height: 1200,
-    note: {
-      zh: "详情页常用宽度示例，高度可按内容继续裁切。",
-      en: "Detail-page width preset. Extend or crop height based on the final content block.",
+      zh: "适合产品灵感图、教程封面和垂直信息流展示。",
+      en: "Vertical image for product inspiration, tutorial covers, and discovery feeds.",
     },
   },
 ];
@@ -286,7 +231,7 @@ async function createPresetImage(
   });
 }
 
-export function EcommerceImagePresetTool({ locale = "zh" }: { locale?: EcommerceImagePresetLocale }) {
+export function EcommerceImagePresetTool({ locale = "zh" }: { locale?: Locale }) {
   const text = copy[locale];
   const [selectedPresetId, setSelectedPresetId] = useState(presets[0].id);
   const [file, setFile] = useState<File | null>(null);
@@ -457,12 +402,12 @@ export function EcommerceImagePresetTool({ locale = "zh" }: { locale?: Ecommerce
             ))}
           </div>
 
-          <label className="mt-4 block text-sm font-semibold text-slate-700" htmlFor="main-image-quality">
+          <label className="mt-4 block text-sm font-semibold text-slate-700" htmlFor="marketplace-image-quality">
             {text.quality}: {Math.round(quality * 100)}%
           </label>
           <input
             className="mt-2 w-full accent-accent-500"
-            id="main-image-quality"
+            id="marketplace-image-quality"
             max="0.95"
             min="0.5"
             onChange={(event) => setQuality(Number(event.target.value))}

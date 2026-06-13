@@ -3,18 +3,18 @@
 import { useMemo, useState } from "react";
 
 const contentTypes = {
-  note: "种草笔记",
-  guide: "干货攻略",
+  post: "社交媒体帖子",
+  guide: "干货教程",
   review: "测评体验",
   list: "清单合集",
-  shop: "探店分享",
+  video: "短视频标题",
 };
 
 type ContentType = keyof typeof contentTypes;
 
 function splitKeywords(value: string) {
   return value
-    .split(/[\n,，、;；]+/)
+    .split(/[\n,，、；;]+/)
     .map((item) => item.trim())
     .filter(Boolean);
 }
@@ -24,7 +24,7 @@ function compactTitle(title: string) {
 }
 
 export function XhsTitleTool() {
-  const [contentType, setContentType] = useState<ContentType>("note");
+  const [contentType, setContentType] = useState<ContentType>("post");
   const [topic, setTopic] = useState("");
   const [audience, setAudience] = useState("");
   const [keywords, setKeywords] = useState("");
@@ -41,35 +41,35 @@ export function XhsTitleTool() {
     const audiencePrefix = targetAudience ? `${targetAudience}看过来` : "新手看过来";
 
     const templates = {
-      note: [
+      post: [
         `${coreTopic}真的太${secondKeyword}了`,
-        `${audiencePrefix}，${coreTopic}这样选不踩坑`,
-        `被问爆的${coreTopic}，${firstKeyword}又${secondKeyword}`,
+        `${audiencePrefix}：${coreTopic}这样做更稳`,
+        `被问很多次的${coreTopic}，重点是${firstKeyword}`,
         `${tone}分享｜${coreTopic}使用体验`,
       ],
       guide: [
-        `${coreTopic}攻略，一篇讲清楚`,
-        `${audiencePrefix}，${coreTopic}避坑指南`,
+        `${coreTopic}教程，一篇讲清楚`,
+        `${audiencePrefix}：${coreTopic}避坑指南`,
         `${coreTopic}怎么做？这 ${keywordList.length || 3} 点很关键`,
         `收藏级干货｜${coreTopic}${thirdKeyword}`,
       ],
       review: [
         `${coreTopic}真实测评：优缺点都说清楚`,
-        `${coreTopic}值不值得？我的体验是这样`,
+        `${coreTopic}值不值得用？我的体验是这样`,
         `${tone}测评｜${coreTopic}${firstKeyword}吗`,
-        `${audiencePrefix}，${coreTopic}测完再决定`,
+        `${audiencePrefix}：${coreTopic}测完再决定`,
       ],
       list: [
-        `${coreTopic}清单整理，直接照着选`,
+        `${coreTopic}清单整理，直接照着用`,
         `${audiencePrefix}，这些${coreTopic}值得收藏`,
-        `${keywordList.length || 5} 个${coreTopic}推荐，${thirdKeyword}`,
+        `${keywordList.length || 5} 个${coreTopic}推荐：${thirdKeyword}`,
         `${coreTopic}合集｜${firstKeyword} ${secondKeyword}`,
       ],
-      shop: [
-        `${coreTopic}探店分享，体验感拉满`,
-        `${audiencePrefix}，这家${coreTopic}可以冲`,
-        `${tone}探店｜${coreTopic}${firstKeyword}又${secondKeyword}`,
-        `${coreTopic}值不值得去？看完再决定`,
+      video: [
+        `${coreTopic}开头这样写，更容易被看完`,
+        `${coreTopic}短视频标题模板，直接改`,
+        `${tone}分享｜${coreTopic}${firstKeyword}又${secondKeyword}`,
+        `${coreTopic}为什么没人看？先改标题`,
       ],
     } satisfies Record<ContentType, string[]>;
 
@@ -127,11 +127,11 @@ export function XhsTitleTool() {
 
       <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
-          <label className="block text-sm font-semibold text-slate-800" htmlFor="xhs-type">
+          <label className="block text-sm font-semibold text-slate-800" htmlFor="social-title-type">
             内容类型
             <select
               className="mt-2 w-full rounded-md border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
-              id="xhs-type"
+              id="social-title-type"
               onChange={(event) => setContentType(event.target.value as ContentType)}
               value={contentType}
             >
@@ -144,44 +144,44 @@ export function XhsTitleTool() {
           </label>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <label className="text-sm font-semibold text-slate-800" htmlFor="xhs-topic">
+            <label className="text-sm font-semibold text-slate-800" htmlFor="social-title-topic">
               主题
               <input
                 className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
-                id="xhs-topic"
+                id="social-title-topic"
                 onChange={(event) => setTopic(event.target.value)}
                 placeholder="例如：新手咖啡杯选购"
                 value={topic}
               />
             </label>
-            <label className="text-sm font-semibold text-slate-800" htmlFor="xhs-audience">
+            <label className="text-sm font-semibold text-slate-800" htmlFor="social-title-audience">
               目标人群
               <input
                 className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
-                id="xhs-audience"
+                id="social-title-audience"
                 onChange={(event) => setAudience(event.target.value)}
-                placeholder="例如：上班族、新手妈妈"
+                placeholder="例如：上班族、新手卖家"
                 value={audience}
               />
             </label>
           </div>
 
-          <label className="block text-sm font-semibold text-slate-800" htmlFor="xhs-keywords">
-            关键词/卖点
+          <label className="block text-sm font-semibold text-slate-800" htmlFor="social-title-keywords">
+            关键词 / 卖点
             <textarea
               className="mt-2 min-h-28 w-full resize-y rounded-md border border-slate-200 p-3 text-sm leading-6 outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
-              id="xhs-keywords"
+              id="social-title-keywords"
               onChange={(event) => setKeywords(event.target.value)}
               placeholder="用逗号或换行分隔，例如：保温, 高颜值, 不漏水"
               value={keywords}
             />
           </label>
 
-          <label className="block text-sm font-semibold text-slate-800" htmlFor="xhs-tone">
+          <label className="block text-sm font-semibold text-slate-800" htmlFor="social-title-tone">
             标题语气
             <input
               className="mt-2 w-full rounded-md border border-slate-200 px-3 py-3 text-sm outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100"
-              id="xhs-tone"
+              id="social-title-tone"
               onChange={(event) => setTone(event.target.value)}
               placeholder="例如：真实、干货、温柔、犀利"
               value={tone}
@@ -192,7 +192,7 @@ export function XhsTitleTool() {
         <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
           <h2 className="text-base font-bold text-slate-950">生成提示</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            小红书标题更适合突出场景、人群、体验感和可收藏价值。生成后建议结合真实内容再微调。
+            社交媒体标题适合突出场景、人群、体验感和可收藏价值。生成后建议结合真实内容、平台规则和品牌语气再微调。
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <button

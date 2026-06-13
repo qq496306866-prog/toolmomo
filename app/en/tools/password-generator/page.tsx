@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { EnglishShell } from "@/components/en/EnglishShell";
-import { InfoPanel } from "@/components/tools/InfoPanel";
+import { EnglishToolWorkspace } from "@/components/en/EnglishToolWorkspace";
 import { PasswordGeneratorTool } from "@/components/tools/PasswordGeneratorTool";
-import { RelatedTools } from "@/components/tools/RelatedTools";
 
 export const metadata: Metadata = {
   title: "Password Generator - Toolmomo English",
@@ -17,19 +15,20 @@ const relatedTools = [
 
 export default function EnglishPasswordGeneratorPage() {
   return (
-    <EnglishShell description="Generate random passwords with configurable length, letters, numbers, and symbols." title="Password Generator">
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-8">
-        <div className="space-y-5">
-          <PasswordGeneratorTool locale="en" />
-          <InfoPanel
-            items={["Generation happens locally in the browser.", "Use different passwords for different sites.", "Use a password manager to store final credentials."]}
-            title="Security notes"
-          />
-        </div>
-        <aside className="space-y-5">
-          <RelatedTools title="Related tools" tools={relatedTools} />
-        </aside>
-      </section>
-    </EnglishShell>
+    <EnglishToolWorkspace
+      actionLabel="Generate secure strings"
+      category="File Tools"
+      description="Generate random passwords with configurable length, letters, numbers, and symbols."
+      guidanceItems={[
+        "Generation happens locally in the browser.",
+        "Use different passwords for different sites.",
+        "Use a password manager to store final credentials.",
+      ]}
+      guidanceTitle="Security notes"
+      relatedTools={relatedTools}
+      title="Password Generator"
+    >
+      <PasswordGeneratorTool locale="en" />
+    </EnglishToolWorkspace>
   );
 }

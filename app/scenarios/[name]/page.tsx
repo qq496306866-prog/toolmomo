@@ -21,12 +21,12 @@ function decodeParam(value: string) {
 }
 
 function getScenario(name: string) {
-  return scenarioPacks.find((pack) => pack.title === name);
+  return scenarioPacks.find((pack) => pack.href === `/scenarios/${name}` || pack.title === name);
 }
 
 export function generateStaticParams() {
   return scenarioPacks.map((pack) => ({
-    name: encodeURIComponent(pack.title),
+    name: pack.href.split("/").pop()!,
   }));
 }
 
@@ -99,11 +99,11 @@ export default async function ScenarioPage({ params }: ScenarioPageProps) {
           {scenarioPacks.map((pack) => (
             <a
               className={
-                pack.title === scenarioName
+                pack.href === `/scenarios/${scenarioName}` || pack.title === scenarioName
                   ? "rounded-md border border-primary-300 bg-primary-50 p-4 shadow-sm"
                   : "rounded-md border border-slate-200 bg-white p-4 shadow-sm hover:border-accent-200 hover:shadow-soft"
               }
-              href={`/scenarios/${encodeURIComponent(pack.title)}`}
+              href={pack.href}
               key={pack.title}
             >
               <h2 className="text-base font-bold text-slate-950">{pack.title}</h2>

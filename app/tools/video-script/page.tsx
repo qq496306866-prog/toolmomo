@@ -6,19 +6,14 @@ import { VideoScriptTool } from "@/components/tools/VideoScriptTool";
 
 export const metadata: Metadata = {
   title: "短视频脚本模板 - Toolmomo 免费中文在线工具箱",
-  description: "根据主题、人群、亮点和时长生成短视频分镜脚本，适合带货、探店、知识分享、测评和 Vlog。",
+  description: "根据主题、人群、亮点和时长生成短视频分镜脚本，适合产品介绍、线下体验、知识分享、测评和 Vlog。",
 };
 
 const relatedTools = [
   {
-    name: "短视频模板生成",
-    href: "/tools/video-template",
-    description: "把脚本内容整理成可预览的 Remotion 视频模板。",
-  },
-  {
-    name: "小红书标题生成",
-    href: "/tools/xhs-title",
-    description: "按场景生成更适合种草内容的标题。",
+    name: "社交媒体标题生成器",
+    href: "/tools/social-media-title-generator",
+    description: "按场景生成更适合社交媒体内容的标题。",
   },
   {
     name: "商品标题优化",
@@ -56,8 +51,8 @@ export default function VideoScriptPage() {
         <VideoScriptTool />
         <InfoPanel
           items={[
-            "适合带货口播、探店、知识分享、测评和 Vlog 草稿。",
-            "可先生成脚本，再用小红书标题工具生成封面标题。",
+            "适合产品介绍口播、线下体验、知识分享、测评和 Vlog 草稿。",
+            "可先生成脚本，再用社交媒体标题工具生成封面标题。",
             "后续接入 AI 后，可以扩展更自然的口播表达。",
           ]}
           title="使用说明"

@@ -13,12 +13,12 @@ const relatedTools = [
   {
     name: "短视频脚本模板",
     href: "/tools/video-script",
-    description: "生成口播、探店、带货等脚本框架。",
+    description: "生成口播、线下体验、产品介绍等脚本框架。",
   },
   {
-    name: "小红书标题生成",
-    href: "/tools/xhs-title",
-    description: "按场景生成更适合种草内容的标题。",
+    name: "社交媒体标题生成器",
+    href: "/tools/social-media-title-generator",
+    description: "按场景生成更适合社交媒体内容的标题。",
   },
   {
     name: "字数统计",
@@ -51,7 +51,7 @@ export default function VideoCoverTitlePage() {
         <VideoCoverTitleTool />
         <InfoPanel
           items={[
-            "适合短视频封面、小红书封面、带货视频和知识卡片。",
+            "适合短视频封面、社交媒体封面、产品介绍视频和知识卡片。",
             "建议把生成标题作为主标题，再搭配 1 行副标题。",
             "后续可以继续扩展封面图尺寸和文字排版预览。",
           ]}

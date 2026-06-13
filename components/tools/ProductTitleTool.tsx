@@ -29,24 +29,24 @@ const platformTips = {
     tone: "Use a retail-style title with brand, product type, differentiators, count, and common shopping terms",
   },
   taobao: {
-    label: "淘宝/天猫",
+    label: "通用电商平台",
     maxLength: 60,
-    tone: "突出品类、核心卖点和适用场景",
+    tone: "突出品类、核心卖点、规格信息和适用场景",
   },
   jd: {
-    label: "京东",
+    label: "品牌官网",
     maxLength: 60,
-    tone: "强调品牌感、规格和品质关键词",
+    tone: "强调品牌感、清晰命名、规格参数和品质关键词",
   },
   pdd: {
-    label: "拼多多",
+    label: "折扣渠道",
     maxLength: 50,
-    tone: "突出实惠、组合、规格和人群需求",
+    tone: "突出实惠、组合、规格和人群需求，不使用夸张承诺",
   },
   xhs: {
-    label: "小红书",
+    label: "社交媒体",
     maxLength: 36,
-    tone: "更像种草标题，突出场景和情绪价值",
+    tone: "更像内容标题，突出场景、体验感和可收藏价值",
   },
 };
 
@@ -179,7 +179,7 @@ export function ProductTitleTool({ locale = "zh" }: ProductTitleToolProps) {
       setPlatform("taobao");
       setProductName("保温咖啡杯");
       setBrand("Toolmomo精选");
-      setSellingPoints("大容量, 长效保温, 便携防漏, 高颜值");
+      setSellingPoints("大容量, 长效保温, 便携防漏, 简洁设计");
       setAudience("上班族");
       setScenario("办公室通勤");
     }

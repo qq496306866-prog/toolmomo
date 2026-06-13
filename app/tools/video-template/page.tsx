@@ -7,14 +7,14 @@ import { VideoTemplateTool } from "@/components/tools/VideoTemplateTool";
 export const metadata: Metadata = {
   title: "短视频模板生成 - Toolmomo 免费中文在线工具箱",
   description:
-    "输入标题、开场钩子和镜头内容，生成可预览的 Remotion 竖版短视频模板数据，适合带货、知识口播和清单视频。",
+    "输入标题、开场钩子和镜头内容，生成可预览的 Remotion 竖版短视频模板数据，适合产品介绍、知识口播和清单视频。",
 };
 
 const relatedTools = [
   {
     name: "短视频脚本模板",
     href: "/tools/video-script",
-    description: "生成口播、探店、带货等脚本框架。",
+    description: "生成产品介绍、线下体验、知识分享等脚本框架。",
   },
   {
     name: "视频封面标题",
@@ -22,8 +22,8 @@ const relatedTools = [
     description: "提炼封面短句，提升内容识别度。",
   },
   {
-    name: "小红书标题生成",
-    href: "/tools/xhs-title",
+    name: "社交媒体标题生成器",
+    href: "/tools/social-media-title-generator",
     description: "按场景生成适合种草内容的标题。",
   },
 ];
@@ -52,7 +52,7 @@ export default function VideoTemplatePage() {
         <VideoTemplateTool />
         <InfoPanel
           items={[
-            "适合生成带货种草、知识口播、清单盘点等竖版视频模板。",
+            "适合生成产品介绍、知识口播、清单盘点等竖版视频模板。",
             "右侧预览使用 @remotion/player，不会上传你的输入内容。",
             "复制 JSON 后，可以作为 Remotion Renderer 的 inputProps。",
           ]}

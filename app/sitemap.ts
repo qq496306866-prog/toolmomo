@@ -1,18 +1,32 @@
 import type { MetadataRoute } from "next";
+import { allContentPages } from "@/data/content";
 import { englishTools } from "@/data/toolsEn";
-import { readyToolPaths } from "@/data/readyTools";
-import { categoryTabs, scenarioPacks } from "@/data/tools";
+import { categoryTabs, scenarioPacks, tools, getCategoryHref } from "@/data/tools";
 
 const siteUrl = "https://toolmomo.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticPaths = ["/", "/tools", "/about", "/contact", "/privacy", "/disclaimer"];
+  const staticPaths = [
+    "/",
+    "/tools",
+    "/ai-tools",
+    "/best-ai-tools",
+    "/deals",
+    "/tutorials",
+    "/about",
+    "/contact",
+    "/privacy",
+    "/disclaimer",
+    "/affiliate-disclosure",
+  ];
   const englishPaths = ["/en", "/en/tools", ...englishTools.map((tool) => tool.href)];
-  const categoryPaths = categoryTabs.map((category) => `/category/${encodeURIComponent(category)}`);
-  const scenarioPaths = scenarioPacks.map((pack) => `/scenarios/${encodeURIComponent(pack.title)}`);
+  const categoryPaths = categoryTabs.map((category) => getCategoryHref(category));
+  const scenarioPaths = scenarioPacks.map((pack) => pack.href);
+  const toolPaths = tools.map((tool) => tool.href);
+  const contentPaths = allContentPages.map((item) => item.href);
 
-  return [...staticPaths, ...englishPaths, ...categoryPaths, ...scenarioPaths, ...readyToolPaths].map((path) => ({
+  return [...staticPaths, ...englishPaths, ...categoryPaths, ...scenarioPaths, ...toolPaths, ...contentPaths].map((path) => ({
     url: `${siteUrl}${path}`,
     lastModified: now,
     changeFrequency: path === "/" ? "daily" : "weekly",

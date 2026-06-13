@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 const platforms = {
   general: "通用标题",
   ecommerce: "电商标题",
-  xhs: "小红书",
+  xhs: "社交媒体",
   video: "短视频",
   article: "文章标题",
 };
@@ -30,7 +30,7 @@ const titlePresets: Array<{
   keywords: string;
 }> = [
   {
-    label: "小红书种草",
+    label: "社交媒体帖子",
     platform: "xhs",
     style: "benefit",
     topic: "通勤咖啡杯选购",

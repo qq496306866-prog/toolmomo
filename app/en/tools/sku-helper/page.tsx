@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { EnglishShell } from "@/components/en/EnglishShell";
+import { EnglishToolWorkspace } from "@/components/en/EnglishToolWorkspace";
 import { InfoPanel } from "@/components/tools/InfoPanel";
-import { RelatedTools } from "@/components/tools/RelatedTools";
 import { SkuHelperTool } from "@/components/tools/SkuHelperTool";
 
 export const metadata: Metadata = {
@@ -29,34 +28,30 @@ const relatedTools = [
 
 export default function EnglishSkuHelperPage() {
   return (
-    <EnglishShell
+    <EnglishToolWorkspace
+      actionLabel="Generate SKU combinations"
+      category="File Tools"
       description="Enter colors, sizes, packs, and variants to generate spreadsheet-friendly SKU codes and names."
+      guidanceItems={[
+        "North American sellers often keep SKU codes short, uppercase, and readable by warehouse staff.",
+        "Common option groups include color, size, pack count, material, and model compatibility.",
+        "Use a stable prefix for each product family so inventory exports remain easy to scan.",
+      ]}
+      guidanceTitle="SKU conventions"
+      relatedTools={relatedTools}
+      secondaryPanel={
+        <InfoPanel
+          items={[
+            "Keep platform-facing variant names customer-friendly.",
+            "Keep internal SKU codes consistent for fulfillment and reporting.",
+            "Avoid changing SKU codes after orders or inventory records exist.",
+          ]}
+          title="Operations notes"
+        />
+      }
       title="SKU Naming Helper"
     >
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-8">
-        <div className="space-y-5">
-          <SkuHelperTool locale="en" />
-          <InfoPanel
-            items={[
-              "North American sellers often keep SKU codes short, uppercase, and readable by warehouse staff.",
-              "Common option groups include color, size, pack count, material, and model compatibility.",
-              "Use a stable prefix for each product family so inventory exports remain easy to scan.",
-            ]}
-            title="SKU conventions"
-          />
-        </div>
-        <aside className="space-y-5">
-          <RelatedTools title="Related tools" tools={relatedTools} />
-          <InfoPanel
-            items={[
-              "Keep platform-facing variant names customer-friendly.",
-              "Keep internal SKU codes consistent for fulfillment and reporting.",
-              "Avoid changing SKU codes after orders or inventory records exist.",
-            ]}
-            title="Operations notes"
-          />
-        </aside>
-      </section>
-    </EnglishShell>
+      <SkuHelperTool locale="en" />
+    </EnglishToolWorkspace>
   );
 }

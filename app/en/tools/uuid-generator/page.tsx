@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { EnglishShell } from "@/components/en/EnglishShell";
-import { InfoPanel } from "@/components/tools/InfoPanel";
-import { RelatedTools } from "@/components/tools/RelatedTools";
+import { EnglishToolWorkspace } from "@/components/en/EnglishToolWorkspace";
 import { UuidGeneratorTool } from "@/components/tools/UuidGeneratorTool";
 
 export const metadata: Metadata = {
@@ -17,19 +15,20 @@ const relatedTools = [
 
 export default function EnglishUuidGeneratorPage() {
   return (
-    <EnglishShell description="Generate UUID v4 values for test data, database records, API work, and temporary identifiers." title="UUID Generator">
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 gap-5 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-8">
-        <div className="space-y-5">
-          <UuidGeneratorTool locale="en" />
-          <InfoPanel
-            items={["UUID v4 is random and useful for non-sequential identifiers.", "Use database constraints when business-critical uniqueness matters.", "Export TXT when you need to paste IDs into spreadsheets or scripts."]}
-            title="Usage notes"
-          />
-        </div>
-        <aside className="space-y-5">
-          <RelatedTools title="Related tools" tools={relatedTools} />
-        </aside>
-      </section>
-    </EnglishShell>
+    <EnglishToolWorkspace
+      actionLabel="Generate UUIDs in bulk"
+      category="File Tools"
+      description="Generate UUID v4 values for test data, database records, API work, and temporary identifiers."
+      guidanceItems={[
+        "UUID v4 is random and useful for non-sequential identifiers.",
+        "Use database constraints when business-critical uniqueness matters.",
+        "Export TXT when you need to paste IDs into spreadsheets or scripts.",
+      ]}
+      guidanceTitle="Usage notes"
+      relatedTools={relatedTools}
+      title="UUID Generator"
+    >
+      <UuidGeneratorTool locale="en" />
+    </EnglishToolWorkspace>
   );
 }

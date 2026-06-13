@@ -1,4 +1,4 @@
-import { categoryTabs } from "@/data/tools";
+import { categoryTabs, getCategoryHref } from "@/data/tools";
 
 export function CategoryTabs() {
   return (
@@ -14,7 +14,7 @@ export function CategoryTabs() {
           {categoryTabs.map((category) => (
             <a
               className="min-w-fit rounded-md border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-600 hover:border-accent-200 hover:bg-accent-50 hover:text-accent-700"
-              href={`/category/${encodeURIComponent(category)}`}
+              href={getCategoryHref(category)}
               key={category}
             >
               {category}

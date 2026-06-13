@@ -10,7 +10,7 @@ export function ScenarioSection() {
           {scenarioPacks.map((pack) => (
             <a
               className="rounded-md border border-slate-200 bg-white p-4 shadow-sm hover:border-accent-200 hover:shadow-soft"
-              href={`/scenarios/${encodeURIComponent(pack.title)}`}
+              href={pack.href}
               key={pack.title}
             >
               <h3 className="text-base font-bold text-slate-950">{pack.title}</h3>

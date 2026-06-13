@@ -3,8 +3,8 @@
 import { useMemo, useState } from "react";
 
 const scriptTypes = {
-  sales: "带货口播",
-  shop: "探店脚本",
+  sales: "产品介绍",
+  shop: "线下体验",
   knowledge: "知识分享",
   review: "测评体验",
   vlog: "生活 Vlog",

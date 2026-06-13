@@ -8,6 +8,7 @@ toolmomo/.next
 .codex
 *.log
 *.zip
+.toolmomo-jobs
 Dockerfile
 docker-compose.yml
 README.md

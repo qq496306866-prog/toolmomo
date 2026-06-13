@@ -16,4 +16,5 @@ pnpm-debug.log*
 .next-start-*.err.log
 .tinywow-preview-*.log
 .tinywow-preview-*.err.log
+.toolmomo-jobs
 *.zip

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import EnglishHome from "./en/page";
+import { PdfHomePage } from "@/components/pdf/PdfHomePage";
 
 export const metadata: Metadata = {
   title: "Toolmomo - Free Online PDF, Image, Write, Video and File Tools",
@@ -14,4 +14,4 @@ export const metadata: Metadata = {
   },
 };
 
-export default EnglishHome;
+export default PdfHomePage;

@@ -1,142 +1,59 @@
-# Toolmomo VPS 部署说明
+# TOOLMOMO VPS deployment
 
-本目录放服务器部署相关参考文件，适用于 Hostinger VPS、Ubuntu 24.04、Nginx、PM2。
+The production target is Hostinger VPS with Node.js, PM2, and Nginx. The app
+must run as a persistent Node process because remote PDF jobs continue after
+the create-job response has been returned.
 
-## 文件说明
+## Environment
 
-- `deploy-ubuntu.sh`：首次部署或更新项目时可参考执行的脚本
-- `update-from-github.sh`：服务器从 GitHub 拉取最新代码并重启网站
-- `nginx-toolmomo.conf`：Nginx 反向代理配置
-
-## 推荐部署目录
+Create `/var/www/toolmomo/.env.production` and set:
 
 ```text
-/var/www/toolmomo
+PDFCO_API_KEY=
+CLOUDCONVERT_API_KEY=
+DEEPL_API_KEY=
+RATE_LIMIT_SALT=replace-with-a-long-random-secret
 ```
 
-## 首次部署步骤
+Keep this file on the server only. Do not commit provider keys.
 
-### 1. 安装服务器环境
-
-```bash
-sudo apt update
-sudo apt install -y nginx git curl
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt install -y nodejs
-sudo npm install -g pm2
-```
-
-### 2. 上传项目
-
-把本地项目上传到：
-
-```text
-/var/www/toolmomo
-```
-
-不要上传这些目录：
-
-```text
-node_modules
-.next
-.next-broken-*
-```
-
-### 3. 构建并启动
+## Install and start
 
 ```bash
 cd /var/www/toolmomo
-npm install
+npm ci
 npm run build
+mkdir -p .toolmomo-jobs
+chmod 700 .toolmomo-jobs
 pm2 start ecosystem.config.cjs
 pm2 save
 ```
 
-### 4. 配置 Nginx
+The `.toolmomo-jobs` directory contains temporary uploads, job metadata, and
+download results. Jobs expire after one hour. The app performs cleanup on new
+job creation; a periodic cleanup request or deployment health check is also
+recommended on low-traffic installations.
 
-```bash
-sudo cp deploy/nginx-toolmomo.conf /etc/nginx/sites-available/toolmomo
-sudo ln -s /etc/nginx/sites-available/toolmomo /etc/nginx/sites-enabled/toolmomo
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-### 5. 配置 HTTPS
-
-域名解析生效后执行：
-
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d toolmomo.com -d www.toolmomo.com
-```
-
-## 更新网站
-
-上传新代码后执行：
-
-```bash
-cd /var/www/toolmomo
-npm install
-npm run build
-pm2 restart toolmomo
-```
-
-## 改用 GitHub 更新
-
-项目已推送到 GitHub 后，推荐把服务器目录改成 Git 仓库，以后不再手动上传 zip。
-
-仓库地址：
-
-```text
-https://github.com/qq496306866-prog/toolmomo.git
-```
-
-### 首次切换
-
-先备份当前线上目录：
-
-```bash
-cd /var/www
-mv toolmomo toolmomo-backup-$(date +%Y%m%d%H%M%S)
-git clone https://github.com/qq496306866-prog/toolmomo.git toolmomo
-cd /var/www/toolmomo
-npm install
-npm run build
-pm2 restart toolmomo
-```
-
-如果 `pm2 restart toolmomo` 提示进程不存在，执行：
-
-```bash
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
-### 后续更新
-
-以后本地推送到 GitHub 后，服务器只需要执行：
+## Update
 
 ```bash
 cd /var/www/toolmomo
 git pull
-npm install
+npm ci
 npm run build
-pm2 restart toolmomo
+pm2 restart toolmomo --update-env
 ```
 
-也可以直接执行：
+## Verify
 
 ```bash
-bash deploy/update-from-github.sh
-```
-
-## 常用排查命令
-
-```bash
+curl -I http://127.0.0.1:3000/
+curl -I http://127.0.0.1:3000/tools
+curl -I http://127.0.0.1:3000/en
+curl -I http://127.0.0.1:3000/sitemap.xml
 pm2 status
-pm2 logs toolmomo
-sudo nginx -t
-sudo systemctl status nginx
-curl -I http://127.0.0.1:3000
-curl -I http://toolmomo.com
+pm2 logs toolmomo --lines 100
 ```
+
+Nginx should proxy `toolmomo.com` to `127.0.0.1:3000`. Use the supplied
+`nginx-toolmomo.conf`, test with `sudo nginx -t`, then reload Nginx.

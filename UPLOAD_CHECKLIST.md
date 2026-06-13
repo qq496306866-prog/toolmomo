@@ -1,63 +1,40 @@
-# Toolmomo 上传清单
+# TOOLMOMO release checklist
 
-把本地项目上传到 Hostinger VPS 时，建议只上传源码和配置，不上传本地生成目录。
+## Before upload
 
-## 推荐方式
+- Run `npm ci`.
+- Run `npm run build`.
+- Confirm `.env.production` is not committed.
+- Confirm all three provider keys and `RATE_LIMIT_SALT` are configured on the
+  server.
+- Confirm `.toolmomo-jobs` is not included in the upload.
 
-在 Windows PowerShell 里执行：
-
-```powershell
-.\scripts\package-upload.ps1
-```
-
-执行后会在项目根目录生成：
-
-```text
-toolmomo-upload.zip
-```
-
-把这个 zip 上传到 VPS 的 `/var/www`，然后解压为：
-
-```text
-/var/www/toolmomo
-```
-
-## 不要上传
-
-这些目录或文件不需要上传：
-
-```text
-node_modules
-.next
-.next-broken-*
-tsconfig.tsbuildinfo
-*.zip
-```
-
-服务器会重新执行：
-
-```bash
-npm install
-npm run build
-```
-
-## VPS 解压示例
-
-```bash
-sudo mkdir -p /var/www/toolmomo
-sudo unzip toolmomo-upload.zip -d /var/www/toolmomo
-cd /var/www/toolmomo
-npm install
-npm run build
-pm2 start ecosystem.config.cjs
-pm2 save
-```
-
-如果是更新已有网站：
+## Deploy
 
 ```bash
 cd /var/www/toolmomo
-npm install
+git pull
+npm ci
 npm run build
-pm2 restart toolmomo
+mkdir -p .toolmomo-jobs
+chmod 700 .toolmomo-jobs
+pm2 restart toolmomo --update-env
 ```
+
+For a first deployment, use `pm2 start ecosystem.config.cjs` followed by
+`pm2 save`.
+
+## Verify
+
+- `/` returns 200.
+- `/tools` returns 200 and lists 46 tools.
+- All `/tools/[slug]` URLs return 200.
+- `/en` and `/en/tools/...` return 308 redirects.
+- Unknown tool slugs return 404.
+- `/sitemap.xml` includes root, tools, legal pages, and all 46 tools.
+- Browser-local tools process and download without uploading files.
+- Configured remote tools create, poll, and download jobs.
+- Unconfigured remote tools are disabled.
+- Private and metadata URLs are rejected by URL to PDF.
+- PM2 is online and Nginx configuration passes `nginx -t`.
+- Temporary job directories disappear after one hour.

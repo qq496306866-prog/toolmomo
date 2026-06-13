@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { EnglishMegaHeader } from "@/components/en/EnglishMegaHeader";
-import { englishCategoryTabs } from "@/data/toolsEn";
 
 type EnglishShellProps = {
   title?: string;
@@ -9,8 +8,6 @@ type EnglishShellProps = {
 };
 
 export function EnglishShell({ title, description, children }: EnglishShellProps) {
-  const primaryCategories = englishCategoryTabs.slice(0, 6);
-
   return (
     <main className="min-h-screen bg-[#f5f7fb] text-[#263244]" lang="en">
       <EnglishMegaHeader />
@@ -19,7 +16,7 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
         <section className="border-b border-[#e9eff6] bg-white">
           <div className="mx-auto max-w-[1220px] px-5 py-10">
             <div className="text-sm font-bold text-[#8392a8]">
-              <a className="hover:text-[#ff5b34]" href="/en">
+              <a className="hover:text-[#ff5b34]" href="/">
                 Home
               </a>
               <span className="mx-2">/</span>
@@ -41,26 +38,20 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
               <span className="text-[25px] font-black text-[#243044]">TOOLMOMO</span>
             </div>
             <p className="mt-4 max-w-md text-[14px] font-semibold leading-7 text-[#728197]">
-              Free online tools for ecommerce sellers, creators, marketers, and developers.
+              Free PDF tools for editing, organizing, converting, signing, and extracting documents.
             </p>
           </div>
           <div>
             <h3 className="text-sm font-black text-[#263244]">Navigate</h3>
             <div className="mt-4 grid gap-3 text-sm font-bold text-[#728197]">
-              <a href="/en">Home</a>
-              <a href="/en/tools">Tools</a>
-              <a href="/">Chinese</a>
+              <a href="/">Home</a>
+              <a href="/tools">PDF Tools</a>
+              <a href="/contact">Contact</a>
             </div>
           </div>
           <div>
             <h3 className="text-sm font-black text-[#263244]">Categories</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]">
-              {primaryCategories.map((category) => (
-                <a href={`/en/tools?category=${encodeURIComponent(category)}`} key={category}>
-                  {category.replace(" Tools", "")}
-                </a>
-              ))}
-            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools/pdf-merge">Merge PDF</a><a href="/tools/compress-pdf">Compress PDF</a><a href="/tools/pdf-to-word">PDF to Word</a><a href="/tools/pdf-to-jpg">PDF to JPG</a><a href="/privacy">Privacy</a><a href="/disclaimer">Disclaimer</a></div>
           </div>
         </div>
       </footer>

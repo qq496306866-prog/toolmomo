@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { mkdir, readFile, readdir, rm, stat, writeFile } from "fs/promises";
 import path from "path";
 import { getPdfTool, MAX_FILE_BYTES } from "@/data/pdfTools";
+import { getRemoteTool } from "@/data/remoteToolRegistry";
 
 export type PdfJobStatus = "queued" | "processing" | "complete" | "failed" | "cancelled";
 export type PdfJob = {
@@ -85,8 +86,8 @@ function assertProviderConfigured(provider: string) {
 }
 
 export async function createJob(args: { tool: string; ipHash: string; files: File[]; options: Record<string, unknown> }) {
-  const definition = getPdfTool(args.tool);
-  if (!definition || definition.provider === "local") throw new Error("This tool does not use remote processing.");
+  const definition = getRemoteTool(args.tool);
+  if (!definition) throw new Error("This tool does not use remote processing.");
   assertProviderConfigured(definition.provider);
   await cleanupExpiredJobs();
   const total = args.files.reduce((sum, file) => sum + file.size, 0);
@@ -139,7 +140,7 @@ async function runPdfCo(job: PdfJob) {
 
 async function runCloudConvert(job: PdfJob) {
   const key = process.env.CLOUDCONVERT_API_KEY; if (!key) throw new Error("CloudConvert is not configured. Add CLOUDCONVERT_API_KEY on the server.");
-  const tool = getPdfTool(job.tool); if (!tool) throw new Error("Unknown conversion tool.");
+  const tool = getRemoteTool(job.tool); if (!tool) throw new Error("Unknown conversion tool.");
   const inputFormat = path.extname(job.inputFiles[0]).slice(1).toLowerCase() || tool.inputFormat;
   const response = await fetch("https://api.cloudconvert.com/v2/jobs", { method: "POST", headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" }, body: JSON.stringify({ tasks: { import: { operation: "import/upload" }, convert: { operation: "convert", input: "import", input_format: inputFormat, output_format: tool.outputFormat }, export: { operation: "export/url", input: "convert" } } }), cache: "no-store" });
   const created = await response.json() as { data?: { id: string; tasks: Array<{ name: string; result?: { form?: { url: string; parameters: Record<string, string> } } }> }; message?: string };

@@ -38,7 +38,7 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
               <span className="text-[25px] font-black text-[#243044]">TOOLMOMO</span>
             </div>
             <p className="mt-4 max-w-md text-[14px] font-semibold leading-7 text-[#728197]">
-              Free PDF tools for editing, organizing, converting, signing, and extracting documents.
+              Private browser tools and secure conversions for PDF, images, writing, video, and files.
             </p>
           </div>
           <div>
@@ -51,7 +51,7 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
           </div>
           <div>
             <h3 className="text-sm font-black text-[#263244]">Categories</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools/pdf-merge">Merge PDF</a><a href="/tools/compress-pdf">Compress PDF</a><a href="/tools/pdf-to-word">PDF to Word</a><a href="/tools/pdf-to-jpg">PDF to JPG</a><a href="/privacy">Privacy</a><a href="/disclaimer">Disclaimer</a></div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools">PDF</a><a href="/tools/image">Image</a><a href="/tools/write">Write</a><a href="/tools/video">Video</a><a href="/tools/file">File</a><a href="/disclaimer">Disclaimer</a></div>
           </div>
         </div>
       </footer>

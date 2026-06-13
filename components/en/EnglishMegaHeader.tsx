@@ -64,7 +64,7 @@ export function EnglishMegaHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-[#eef2f7] bg-white/95 shadow-[0_8px_30px_rgba(32,43,60,0.05)] backdrop-blur">
       <div className="mx-auto flex h-[72px] max-w-[1220px] items-center gap-4 px-5">
-        <a className="flex min-w-fit items-center gap-3" href="/en">
+        <a className="flex min-w-fit items-center gap-3" href="/">
           <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#ff5b34] text-xl font-black text-white">T</span>
           <span className="hidden text-[25px] font-black text-[#243044] sm:block">TOOLMOMO</span>
         </a>

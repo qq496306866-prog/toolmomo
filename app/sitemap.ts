@@ -20,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/disclaimer",
     "/affiliate-disclosure",
   ];
-  const englishPaths = ["/en", "/en/tools", ...englishTools.map((tool) => tool.href)];
+  const englishPaths = ["/en/tools", ...englishTools.map((tool) => tool.href)];
   const categoryPaths = categoryTabs.map((category) => getCategoryHref(category));
   const scenarioPaths = scenarioPacks.map((pack) => pack.href);
   const toolPaths = tools.map((tool) => tool.href);

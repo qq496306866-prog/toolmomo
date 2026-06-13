@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   description:
     "Toolmomo English provides free online tools for ecommerce sellers, creators, marketers, and developers.",
   alternates: {
-    canonical: "/en",
+    canonical: "/",
     languages: {
-      "zh-CN": "/",
-      en: "/en",
+      en: "/",
+      "x-default": "/",
     },
   },
 };

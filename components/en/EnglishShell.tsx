@@ -46,13 +46,13 @@ export function EnglishShell({ title, description, children }: EnglishShellProps
             <h3 className="text-sm font-black text-[#263244]">Navigate</h3>
             <div className="mt-4 grid gap-3 text-sm font-bold text-[#728197]">
               <a href="/">Home</a>
-              <a href="/tools">PDF Tools</a>
+              <a href="/tools">All Tools</a>
               <a href="/contact">Contact</a>
             </div>
           </div>
           <div>
             <h3 className="text-sm font-black text-[#263244]">Categories</h3>
-            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools">PDF</a><a href="/tools/image">Image</a><a href="/tools/write">Write</a><a href="/tools/video">Video</a><a href="/tools/file">File</a><a href="/privacy">Privacy</a><a href="/disclaimer">Disclaimer</a><ConsentControls /></div>
+            <div className="mt-4 grid grid-cols-2 gap-3 text-sm font-bold text-[#728197]"><a href="/tools/pdf">PDF</a><a href="/tools/image">Image</a><a href="/tools/write">Write</a><a href="/tools/video">Video</a><a href="/tools/file">File</a><a href="/privacy">Privacy</a><a href="/disclaimer">Disclaimer</a><ConsentControls /></div>
           </div>
         </div>
       </footer>

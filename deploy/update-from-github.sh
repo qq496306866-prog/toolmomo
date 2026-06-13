@@ -7,6 +7,7 @@ APP_NAME="toolmomo"
 cd "$APP_DIR"
 
 git pull --ff-only
+export APP_VERSION="$(git rev-parse --short HEAD)"
 npm ci
 npm run build
 mkdir -p .toolmomo-jobs

@@ -1,2 +1,2 @@
 import type { MetadataRoute } from "next";
-export default function manifest(): MetadataRoute.Manifest { return { name: "Toolmomo PDF Tools", short_name: "Toolmomo", description: "Free online PDF editing and conversion tools.", start_url: "/", display: "standalone", background_color: "#f5f7fb", theme_color: "#ff5b34", lang: "en", icons: [{ src: "/icon.svg", sizes: "64x64", type: "image/svg+xml" }] }; }
+export default function manifest(): MetadataRoute.Manifest { return { name: "Toolmomo Online Tools", short_name: "Toolmomo", description: "Free PDF, image, writing, video, audio, and file tools.", start_url: "/", display: "standalone", background_color: "#f5f7fb", theme_color: "#ff5b34", lang: "en", icons: [{ src: "/icon.svg", sizes: "64x64", type: "image/svg+xml" }] }; }

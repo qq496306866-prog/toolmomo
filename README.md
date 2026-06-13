@@ -45,3 +45,14 @@ RATE_LIMIT_SALT=replace-with-a-long-random-secret
 
 Provider keys are server-only. See `deploy/README.md` for Hostinger, PM2, and
 Nginx deployment instructions and the AdSense/CMP launch checklist.
+
+## Verification
+
+After starting a production instance, run the public route and service checks:
+
+```bash
+SITE_URL=http://127.0.0.1:3000 npm run test:site
+```
+
+The `/api/health` endpoint reports the deployed version and provider readiness
+without exposing API keys.

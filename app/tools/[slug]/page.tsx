@@ -25,7 +25,7 @@ export default async function PdfToolPage({ params }: { params: Promise<{ slug: 
       <section className="bg-white"><div className="mx-auto max-w-[920px] px-5 py-12 text-center"><div className="mx-auto grid h-20 w-20 place-items-center rounded-[26px] bg-[#fff1ee] text-lg font-black text-[#ef5535]">{tool.icon}</div><p className="mt-6 text-sm font-black uppercase text-[#ff5b34]">PDF Tools</p><h1 className="mt-3 text-[42px] font-black leading-tight text-[#202b3c] sm:text-[60px]">{tool.name}</h1><p className="mx-auto mt-4 max-w-2xl text-lg font-semibold leading-8 text-[#728197]">{tool.description}</p>{tool.note ? <p className="mx-auto mt-4 max-w-2xl rounded-[16px] bg-[#fff8e8] px-4 py-3 text-sm font-bold text-[#8b6428]">{tool.note}</p> : null}</div></section>
       <section className="mx-auto max-w-[980px] px-5 pb-14"><PdfToolWorkspace tool={tool} /></section>
       <section className="mx-auto max-w-[1100px] px-5 py-10"><AdSenseUnit slot={process.env.NEXT_PUBLIC_ADSENSE_TOOL_SLOT} /></section>
-      <ToolDetails name={tool.name} category="PDF" mode={tool.provider === "local" ? "browser" : "remote"} formats={tool.accept || "PDF or the URL requested by the tool"} note={tool.note} related={related} />
+      <ToolDetails name={tool.name} description={tool.description} category="PDF" mode={tool.provider === "local" ? "browser" : "remote"} formats={tool.accept || "PDF or the URL requested by the tool"} note={tool.note} related={related} />
     </EnglishShell>
   );
 }

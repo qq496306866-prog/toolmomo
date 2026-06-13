@@ -61,6 +61,8 @@ curl -I http://127.0.0.1:3000/tools
 curl -I http://127.0.0.1:3000/en
 curl -I http://127.0.0.1:3000/sitemap.xml
 curl -i http://127.0.0.1:3000/ads.txt
+curl -s http://127.0.0.1:3000/api/health
+npm run test:site
 pm2 status
 pm2 logs toolmomo --lines 100
 ```

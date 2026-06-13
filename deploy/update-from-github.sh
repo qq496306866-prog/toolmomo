@@ -6,12 +6,14 @@ APP_NAME="toolmomo"
 
 cd "$APP_DIR"
 
-git pull
-npm install
+git pull --ff-only
+npm ci
 npm run build
+mkdir -p .toolmomo-jobs
+chmod 700 .toolmomo-jobs
 
 if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
-  pm2 restart "$APP_NAME"
+  pm2 restart "$APP_NAME" --update-env
 else
   pm2 start ecosystem.config.cjs
 fi
